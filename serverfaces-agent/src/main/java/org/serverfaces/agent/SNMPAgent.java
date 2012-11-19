@@ -56,7 +56,7 @@ import org.snmp4j.transport.TransportMappings;
 /**
  * @author Rafael M. Pestano
  */
-@Singleton//note its a CDI singleton not an EJB one
+@Singleton
 public class SNMPAgent extends BaseAgent implements Serializable {
 
     @Inject

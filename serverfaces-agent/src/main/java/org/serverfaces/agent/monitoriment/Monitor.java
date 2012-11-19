@@ -23,7 +23,6 @@ package org.serverfaces.agent.monitoriment;
 import org.serverfaces.agent.mib.MIBManager;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.DependsOn;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -32,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.serverfaces.agent.SNMPAgent;
 import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.util.Constants;
-import org.serverfaces.common.OIDProvider;
 import org.serverfaces.common.qualifier.Log;
 import org.snmp4j.smi.OctetString;
 
@@ -62,9 +60,8 @@ public class Monitor {
             log.debug("SNMP agent is starting...");
             
             agent.start();
-            // Since BaseAgent reginullsgetDefaultCters some MIBs by default we need to unregister
-            // one before we register our own sysDescr. Normally you would
-            // override that method and register the MIBs that you need
+            // Since BaseAgent registers some MIBs by default we need to unregister
+            // one before we register our own sysDescr.
             agent.unregisterManagedObject(agent.getSnmpv2MIB());
             agent.setDefaultContext(new OctetString("public"));
             mibManager.initMIB();

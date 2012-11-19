@@ -25,8 +25,8 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 /**
  *
  * @author Rafael M. Pestano - Nov 16, 2012 5:12:20 PM
- *
- * A simple snmp manager to test agent
+ * 
+ * the guy who communicates with agent via SNMP protocol
  */
 @Singleton
 public class SNMPManager implements Serializable{

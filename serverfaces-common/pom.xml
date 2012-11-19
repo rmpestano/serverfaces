@@ -9,7 +9,6 @@
 
     <name>serverfaces-common</name>
 
-
     <parent>
         <groupId>org.serverfaces</groupId>
         <artifactId>parent</artifactId>
@@ -19,24 +18,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
   
-    <inceptionYear>2012</inceptionYear>   
-    
-    <developers>
-        <developer>
-            <id>rmpestano</id>
-            <name>Rafael Pestano</name>
-            <email>rmpestano@gmmail.com</email>
-            <roles>
-                <role>Project Owner</role>
-                <role>Developer</role>
-            </roles>
-            <timezone>-3</timezone>
-        </developer>
-    </developers>
-
-    <dependencies>
-       
-    </dependencies>
     <build>
         <finalName>serverfaces-common</finalName>
     </build>
