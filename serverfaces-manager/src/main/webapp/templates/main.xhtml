@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:framework="http://java.sun.com/jsf/composite/components/conventions"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <f:view contentType="text/html">
+        <h:head>
+            <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+            <h:outputStylesheet name="default.css" library="css"/>
+            <ui:param name="g" value=":mainForm:growl"/>
+            <title>Application Server Monitoring...</title>
+        </h:head>
+        <h:body>
+            <h:form id="mainForm">
+                <div align="center">
+                    <p:panel id="mainPanel" header="ServerFaces Manager" style="height:600px;width: 800px">
+                          <p:menubar>
+                              <p:menuitem url="/home.faces" value="Home" icon="ui-icon home" ajax="false" immediate="true" />
+                              <p:menuitem url="/server.faces" value="Monitoring" icon="ui-icon monitoring" ajax="false" immediate="true"/>
+                              <p:menuitem url="/statistic.faces" value="Statistics" icon="ui-icon statistics" ajax="false" immediate="true"/>
+                         </p:menubar> 
+                        <p:growl id="growl" escape="false" life="7000"/>
+                        <p:outputPanel id="pageControl" layout="block">
+                            <ui:insert name="content"/>
+                        </p:outputPanel>
+                    </p:panel>
+                  </div>  
+                    <style type="text/css">
+                        .even-row{
+                            background-color: #E6F2FB !important;
+                            background-image: none;
+                        }
+                    </style>
+            </h:form>   
+            <ui:insert name="popup"/>
+        </h:body>
+    </f:view>
+</html>

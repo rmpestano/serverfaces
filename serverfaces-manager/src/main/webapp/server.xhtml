@@ -1,0 +1,58 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:fn="http://conventions.org/fnc"
+                template="templates/main.xhtml">
+
+    <ui:define name="content">
+        <p:tooltip for="addServerInpTxr"  value="{ip address}/{port} - example: 127.0.0.1/16112"/>  
+        <h:panelGrid columns="3" style="margin: 10px; width: 400px" cellpadding="0" cellspacing="0">
+            <p:outputLabel for="addServerInpTxr" value="Agent Address:"/>
+            <p:inputText id="addServerInpTxr" value="#{managerMBean.agentAddress}" required="true"/>
+            <p:commandButton value="Add new server..." icon="ui-icon server" action="#{managerMBean.addServer}" update="mainForm:dashboardPanel #{g}" process="@this mainForm:addServerInpTxr"/>
+        </h:panelGrid>
+        <p:outputPanel layout="block" id="dashboardPanel">
+            <center>#{managerMBean.numMonitoredServers}</center>
+            <p:dashboard model="#{managerMBean.model}">
+                <ui:remove><!--TODO use pe:dynaForm instead of fixed number of panels --></ui:remove>
+                <p:panel id="panel0" header="#{managerMBean.servers.get(0).info.name}">
+                    <ui:param name="s1" value="#{managerMBean.servers.get(0)}"/>
+                     #{s1.agentAddress}
+                </p:panel>
+                <p:panel id="panel1" header="#{managerMBean.servers.get(1).info.serverName}"  >
+                   panel1
+                </p:panel>
+                <p:panel id="panel2" header="#{managerMBean.servers.get(2).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 3}">
+
+                </p:panel>
+                <p:panel id="panel3" header="#{managerMBean.servers.get(3).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 4}">
+
+                </p:panel>
+                <p:panel id="panel4" header="#{managerMBean.servers.get(4).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 5}">
+
+                </p:panel>
+                <p:panel id="panel5" header="#{managerMBean.servers.get(5).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 6}">
+
+                </p:panel>
+                <p:panel id="panel6" header="#{managerMBean.servers.get(6).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 7}">
+
+                </p:panel>
+                <p:panel id="panel7" header="#{managerMBean.servers.get(7).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 8}">
+
+                </p:panel>
+                <p:panel id="panel8" header="#{managerMBean.servers.get(8).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 9}">
+
+                </p:panel>
+                <p:panel id="panel9" header="#{managerMBean.servers.get(9).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 10}">
+
+                </p:panel>
+
+            </p:dashboard>
+        </p:outputPanel>
+    </ui:define>
+
+</ui:composition>

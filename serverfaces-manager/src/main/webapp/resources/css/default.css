@@ -1,0 +1,54 @@
+/* 
+    Document   : arc
+    Created on : Jul 21, 2012, 5:36:56 PM
+    Author     : VAIO
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.ui-widget {
+    font-size: 12px !important;
+}
+
+.ui-panel .ui-panel-content{
+    
+    padding: 0.5em 0.5em!important;
+}
+
+.ui-menubar{
+    margin-top: -6px;
+    width: 100%;
+}
+
+.ui-panel-title{
+    font-size: 16px;
+}
+
+.ui-menuitem{
+    margin-left: 4px!important;
+}
+.ui-datalist-content{
+    border: none;
+    background-image: none;
+}
+
+.home{
+        background: url('../resources/images/home.png') !important;
+        margin-right: 2px;
+}
+
+.monitoring{
+        background: url('../resources/images/monitoring.gif') !important;
+        margin-right: 2px;
+}
+
+.statistics{
+        background: url('../resources/images/statistics.png') !important;
+        margin-right: 2px;
+}
+
+.server{
+        background: url('../resources/images/server.jpg') !important;
+        width: 16px;
+        height: 16px;
+}
