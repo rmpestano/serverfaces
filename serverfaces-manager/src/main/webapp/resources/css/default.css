@@ -24,6 +24,10 @@
     font-size: 16px;
 }
 
+.monitoringPanel .ui-panel-title{
+    font-size: 12px;
+}
+
 .ui-menuitem{
     margin-left: 4px!important;
 }
@@ -52,3 +56,12 @@
         width: 16px;
         height: 16px;
 }
+
+.label{
+    text-align: right;
+}
+
+.form{
+    text-align: left;
+}
+ 

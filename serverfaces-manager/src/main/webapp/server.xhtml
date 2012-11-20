@@ -5,54 +5,60 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:pe="http://primefaces.org/ui/extensions"
-                xmlns:fn="http://conventions.org/fnc"
+                xmlns:sf="http://serverfaces.org/ui"
                 template="templates/main.xhtml">
 
     <ui:define name="content">
-        <p:tooltip for="addServerInpTxr"  value="{ip address}/{port} - example: 127.0.0.1/16112"/>  
+        <p:tooltip for="addServerInpTxr"  value="{ip address}/{port} - example: localhost/16112"/>  
         <h:panelGrid columns="3" style="margin: 10px; width: 400px" cellpadding="0" cellspacing="0">
             <p:outputLabel for="addServerInpTxr" value="Agent Address:"/>
-            <p:inputText id="addServerInpTxr" value="#{managerMBean.agentAddress}" required="true"/>
-            <p:commandButton value="Add new server..." icon="ui-icon server" action="#{managerMBean.addServer}" update="mainForm:dashboardPanel #{g}" process="@this mainForm:addServerInpTxr"/>
+            <p:inputText autocomplete="true" id="addServerInpTxr" value="#{managerMBean.agentAddress}" required="true" requiredMessage="The agent address is required"/>
+            <p:commandButton value="Add new server..." icon="ui-icon server" action="#{managerMBean.addServer}" update="mainForm:monitoringPanel #{g}"  style="margin-left: 3px" onclick="blocker.show()" oncomplete="blocker.hide()"/>
         </h:panelGrid>
-        <p:outputPanel layout="block" id="dashboardPanel">
-            <center>#{managerMBean.numMonitoredServers}</center>
-            <p:dashboard model="#{managerMBean.model}">
-                <ui:remove><!--TODO use pe:dynaForm instead of fixed number of panels --></ui:remove>
-                <p:panel id="panel0" header="#{managerMBean.servers.get(0).info.name}">
-                    <ui:param name="s1" value="#{managerMBean.servers.get(0)}"/>
-                     #{s1.agentAddress}
-                </p:panel>
-                <p:panel id="panel1" header="#{managerMBean.servers.get(1).info.serverName}"  >
-                   panel1
-                </p:panel>
-                <p:panel id="panel2" header="#{managerMBean.servers.get(2).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 3}">
-
-                </p:panel>
-                <p:panel id="panel3" header="#{managerMBean.servers.get(3).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 4}">
-
-                </p:panel>
-                <p:panel id="panel4" header="#{managerMBean.servers.get(4).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 5}">
-
-                </p:panel>
-                <p:panel id="panel5" header="#{managerMBean.servers.get(5).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 6}">
-
-                </p:panel>
-                <p:panel id="panel6" header="#{managerMBean.servers.get(6).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 7}">
-
-                </p:panel>
-                <p:panel id="panel7" header="#{managerMBean.servers.get(7).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 8}">
-
-                </p:panel>
-                <p:panel id="panel8" header="#{managerMBean.servers.get(8).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 9}">
-
-                </p:panel>
-                <p:panel id="panel9" header="#{managerMBean.servers.get(9).info.serverName}" rendered="#{managerMBean.numMonitoredServers ge 10}">
-
-                </p:panel>
-
-            </p:dashboard>
+        
+        <p:outputPanel layout="block" id="monitoringPanel">
+           
+            <h:panelGrid columns="2" rendered="#{not empty managerMBean.servers}">
+            <ui:repeat var="s" value="#{managerMBean.servers}">
+                  <p:panel  header="#{s.info.name}" style="width: 370px;overflow: auto;font-size: 11px" styleClass="monitoringPanel ui-panel-title" >
+                     <f:facet name="actions">  
+                         <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{managerMBean.doServerMoniring(s)}" >  
+                            <h:outputText styleClass="ui-icon ui-icon-help" />  
+                        </p:commandLink>  
+                    </f:facet>  
+                        <h:panelGrid columnClasses="label,form" columns="2" style="text-align: right;">
+                            <h:outputLabel for="agent" value="Agent:" style="font-weight: bold"/>
+                            <h:outputText id="agent" value="#{s.agentAddress}"/>
+                            <h:outputLabel for="uptime" value="Uptime:" style="font-weight: bold"/>
+                            <h:outputText id="uptime" value="#{s.info.uptime}"/>
+                            <h:outputLabel for="sessions" value=" Active Sessions:" style="font-weight: bold"/>
+                            <h:outputText id="sessions" value="#{s.info.activeSessions}"/>
+                            <h:outputLabel for="usedMemory" value="Used Memory:" style="font-weight: bold"/>
+                            <h:outputText id="usedMemory" value="#{s.info.usedMemory}"/>
+                            <h:outputLabel for="availableMemory" value="Available Memory:" style="font-weight: bold"/>
+                            <h:outputText id="availableMemory" value="#{s.info.availableMemory}"/>
+                            <h:outputLabel for="cpuTime" value="Cpu Time(khz):" style="font-weight: bold"/>
+                            <h:outputText id="cpuTime" value="#{s.info.cpuTime}"/>
+                            <h:outputLabel for="activeTransactions" value="Active Transactions:" style="font-weight: bold"/>
+                            <h:outputText id="activeTransactions" value="#{s.info.activeTransactions}"/>
+                            <h:outputLabel for="commitedTransactions" value="Commited Transactions:" style="font-weight: bold"/>
+                            <h:outputText id="commitedTransactions" value="#{s.info.commitedTransactions}"/>
+                            <h:outputLabel for="rollbackTransactions" value="Rollback Transactions:" style="font-weight: bold"/>
+                            <h:outputText id="rollbackTransactions" value="#{s.info.rollbackTransactions}"/>
+                            <h:outputLabel for="activeThreads" value="Active Threads:" style="font-weight: bold"/>
+                            <h:outputText id="activeThreads" value="#{s.info.activeThreads}"/>
+                        </h:panelGrid>
+                    </p:panel>
+                 </ui:repeat>
+                </h:panelGrid>
         </p:outputPanel>
+        
+        <p:dialog header="Adding Server" widgetVar="blocker" modal="true" showEffect="fade" hideEffect="clip" height="100px" width="250px">
+            <br/>
+            <center>
+                <h:graphicImage library="images" name="ajax-loader.gif"/>
+            </center>
+        </p:dialog>
     </ui:define>
 
 </ui:composition>

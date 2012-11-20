@@ -119,7 +119,9 @@ public class MIBManager implements Serializable {
      * updates dynamic values in management information base
      */
     public void updateMIB() {
-        this.setScalar(serverUptime.get(), new OctetString(serverRetriever.getServerUpTime()));
+        OctetString uptime = new OctetString();
+        uptime.setValue(serverRetriever.getServerUpTime());
+        this.setScalar(serverUptime.get(), uptime);
         this.setScalar(serverActiveSessions.get(), new OctetString(serverRetriever.getServerActiveSessions()));
         this.setScalar(serverUsedMemory.get(), new OctetString(serverRetriever.getServerUsedMemory()));
         this.setScalar(serverAvailableMemory.get(), new OctetString(serverRetriever.getServerAvailableMemory()));

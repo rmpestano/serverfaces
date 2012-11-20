@@ -20,6 +20,7 @@ public class MonitorableResource implements Serializable{
     private String name;
     private String uptime;
     private String activeSessions;
+    private String usedMemory;
     private String availableMemory;
     private String cpuTime;
     private String activeTransactions;
@@ -58,6 +59,14 @@ public class MonitorableResource implements Serializable{
 
     public void setAvailableMemory(String availableMemory) {
         this.availableMemory = availableMemory;
+    }
+
+    public String getUsedMemory() {
+        return usedMemory;
+    }
+
+    public void setUsedMemory(String usedMemory) {
+        this.usedMemory = usedMemory;
     }
 
     public String getCpuTime() {

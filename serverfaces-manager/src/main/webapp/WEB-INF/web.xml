@@ -36,6 +36,13 @@
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
         <location>/index.html</location>
     </error-page>
+    
+    <context-param>
+        <param-name>facelets.LIBRARIES</param-name>
+        <param-value>
+            /WEB-INF/serverfaces.taglib.xml
+        </param-value>
+    </context-param>
 </web-app>
 
 

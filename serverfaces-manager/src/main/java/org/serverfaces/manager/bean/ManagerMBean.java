@@ -5,6 +5,7 @@
 
 package org.serverfaces.manager.bean;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +15,6 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.log4j.Logger;
-import org.primefaces.model.DashboardColumn;
-import org.primefaces.model.DashboardModel;
-import org.primefaces.model.DefaultDashboardColumn;
-import org.primefaces.model.DefaultDashboardModel;
 import org.serverfaces.common.qualifier.Log;
 import org.serverfaces.manager.SNMPManager;
 import org.serverfaces.manager.model.Server;
@@ -33,9 +30,6 @@ import org.snmp4j.smi.OID;
 @SessionScoped
 public class ManagerMBean implements Serializable{
     
-    private DashboardModel model;
-    private final int LEFT_COLUMN_INDEX = 0;
-    private final int RIGHT_COLUMN_INDEX = 1;
     private final int NUM_ALLOWED_SERVERS = 10;
     private String agentAddress;
     @Inject @Log
@@ -43,6 +37,27 @@ public class ManagerMBean implements Serializable{
     
     @Inject
     Instance<OID> serverName;
+    @Inject
+    Instance<OID> serverUptime;
+    @Inject
+    Instance<OID> serverActiveSessions;
+    @Inject
+    Instance<OID> serverUsedMemory;
+    @Inject
+    Instance<OID> serverAvailableMemory;
+    @Inject
+    Instance<OID> serverCpuTime;
+    @Inject
+    Instance<OID> serverActiveTransactions;
+    @Inject
+    Instance<OID> serverCommitedTransactions;
+    @Inject
+    Instance<OID> serverRollbackTransactions;
+    @Inject
+    Instance<OID> serverActiveThreads;
+    @Inject
+    Instance<OID> serverTotalRequests;
+   
     
     @Inject
     private SNMPManager sNMPManager;
@@ -55,70 +70,31 @@ public class ManagerMBean implements Serializable{
     
     @PostConstruct
     public void initialize(){
-        model = new DefaultDashboardModel();
-        model.addColumn(new DefaultDashboardColumn());
-        model.addColumn(new DefaultDashboardColumn());
         servers = new ArrayList<Server>();
     }
 
-    public DashboardModel getModel() {
-        return model;
-    }
-
-    public void setModel(DashboardModel model) {
-        this.model = model;
-    }
-    
     public void addServer(){
-        
-        //TODO remove this restriction after adding dynaForm in server.xhml
-        if(getNumMonitoredServers() == NUM_ALLOWED_SERVERS){
-            messages.addError("You cannot manage more then 10 servers!");
-            return;
-        }
-        if(this.serverAlreadyMonitored(agentAddress)){
-            messages.addError("Could not add server because its already being monitored!");
-            return;
-        }
-        
-        if(!this.verifyAgentConection()){
-            messages.addError("Could not establish connection with agent:"+agentAddress);
-            return;
-        }
-        
-        //add widget to the column with less servers
-        DashboardColumn column = null;
-        if(model.getColumn(LEFT_COLUMN_INDEX).getWidgetCount() <= model.getColumn(RIGHT_COLUMN_INDEX).getWidgetCount()){
-            column = model.getColumn(LEFT_COLUMN_INDEX);
-        }
-        else{
-            column = model.getColumn(RIGHT_COLUMN_INDEX);
-        }
-        column.addWidget("panel"+getNumMonitoredServers());
-        Server s = new Server(agentAddress);
-        s.getInfo().setName("Glassfish");
-        servers.add(s);
-        messages.addInfo("Server added successfully!");
-    }
-    
-    public String getWidgetByIndex(int index){
-        
-        return getColumnByIndex(index).getWidget(index); 
-    }
-    
-    private void removeColumnWidget(String widget, int column){
-        model.getColumn(column).removeWidget(widget);
-    }
-    
-    private void addColumnWidget(String widget, int column){
-        model.getColumn(column).addWidget(widget);
-    }
-    
-    private DashboardColumn getColumnByIndex(int index){
-        if(index %2 == 0){
-            return model.getColumn(LEFT_COLUMN_INDEX);
-        }else{
-            return model.getColumn(RIGHT_COLUMN_INDEX);
+        try {
+            //TODO remove this restriction after adding dynaForm in server.xhml
+            if(getNumMonitoredServers() == NUM_ALLOWED_SERVERS){
+                messages.addError("You cannot manage more then 10 servers!");
+                return;
+            }
+            if(this.serverAlreadyMonitored(agentAddress)){
+                messages.addError("Could not add server because its already being monitored!");
+                return;
+            }
+            
+            if(!this.verifyAgentConection()){
+                messages.addError("Could not establish connection with agent:"+agentAddress);
+                return;
+            }
+            Server s = new Server(agentAddress);
+            servers.add(s);
+            this.doServerMoniring(s);
+            messages.addInfo("Server added successfully!");
+        } catch (IOException ex) {
+            //TODO handle exception
         }
     }
     
@@ -128,13 +104,15 @@ public class ManagerMBean implements Serializable{
     }
     
     /**
-     * 
      * @param agentAddress
-     * @return <code>true</code> if agendAddress is a widget of one of the widget columns 
-     *         <code>false</code> if agentAddress isn't found in any column 
      */
     private boolean serverAlreadyMonitored(String agentAddress){
-        return (model.getColumn(RIGHT_COLUMN_INDEX).getWidgets().contains(agentAddress) || model.getColumn(RIGHT_COLUMN_INDEX).getWidgets().contains(agentAddress));
+        for (Server server : servers) {
+            if(server.getAgentAddress().equalsIgnoreCase(agentAddress)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Server> getServers() {
@@ -164,5 +142,20 @@ public class ManagerMBean implements Serializable{
          
                  
     }
+
+    public void doServerMoniring(Server server) throws IOException {
+          sNMPManager.setAgentAddress(server.getAgentAddress());
+          server.getInfo().setName(sNMPManager.getAsString(serverName.get()));
+          server.getInfo().setActiveSessions(sNMPManager.getAsString(serverActiveSessions.get()));
+          server.getInfo().setActiveThreads(sNMPManager.getAsString(serverActiveThreads.get()));
+          server.getInfo().setActiveTransactions(sNMPManager.getAsString(serverActiveTransactions.get()));
+          server.getInfo().setAvailableMemory(sNMPManager.getAsString(serverAvailableMemory.get()));
+          server.getInfo().setUsedMemory(sNMPManager.getAsString(serverUsedMemory.get()));
+          server.getInfo().setCommitedTransactions(sNMPManager.getAsString(serverCommitedTransactions.get()));
+          server.getInfo().setCpuTime(sNMPManager.getAsString(serverCpuTime.get()));
+          server.getInfo().setRollbackTransactions(sNMPManager.getAsString(serverRollbackTransactions.get()));
+          server.getInfo().setTotalRequests(sNMPManager.getAsString(serverTotalRequests.get()));
+          server.getInfo().setUptime(sNMPManager.getAsString(serverUptime.get()));
+     }
     
 }
