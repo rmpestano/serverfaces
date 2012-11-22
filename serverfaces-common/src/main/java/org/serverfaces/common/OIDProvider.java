@@ -82,7 +82,6 @@ public class OIDProvider {
         this.provider.put("serverActiveThreads", new OID(mib.getProperty(Enums.MIB.SERVER_ACTIVE_THREADS.value)));
         this.provider.put("serverTotalRequests", new OID(mib.getProperty(Enums.MIB.SERVER_TOTAL_REQUESTS.value)));
         log.debug("OID Provider Initialized!");
-        System.out.println("OID Provider Initialized!");
     }
 
     @Produces
