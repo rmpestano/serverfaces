@@ -23,9 +23,13 @@ package org.serverfaces.agent.monitoriment;
 import org.serverfaces.agent.mib.MIBManager;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.serverfaces.agent.SNMPAgent;
@@ -40,6 +44,8 @@ import org.snmp4j.smi.OctetString;
  */
 @Singleton
 @Startup
+@Lock(LockType.READ)
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class Monitor {
 
     @Inject @Log
