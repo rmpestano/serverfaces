@@ -26,8 +26,12 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.serverfaces.common.qualifier.Log;
@@ -37,7 +41,7 @@ import org.snmp4j.smi.OID;
 /**
  *
  * create instances of OIDs based on their key names in
- * serverfaces-mib.properties
+ * mib.properties
  *
  * Usage:
  *
@@ -56,6 +60,8 @@ import org.snmp4j.smi.OID;
  */
 @Singleton
 @Startup
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+@Lock(LockType.READ)
 public class OIDProvider {
 
     private Map<String, OID> provider;
