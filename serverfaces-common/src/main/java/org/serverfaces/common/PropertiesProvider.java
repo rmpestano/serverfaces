@@ -41,7 +41,6 @@ import javax.inject.Named;
  * @author Rafaem M. Pestano - Jul 7, 2012 7:03:43 PM
  * 
  */
-@Named
 @ApplicationScoped
 public class PropertiesProvider implements Serializable {
     

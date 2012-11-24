@@ -143,6 +143,12 @@ public class ManagerMBean implements Serializable{
                  
     }
 
+    public void doMonitoring() throws IOException{
+        for (Server server : servers) {
+            doServerMoniring(server);
+        }
+    }
+    
     public void doServerMoniring(Server server) throws IOException {
           sNMPManager.setAgentAddress(server.getAgentAddress());
           server.getInfo().setName(sNMPManager.getAsString(serverName.get()));

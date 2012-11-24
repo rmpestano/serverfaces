@@ -17,12 +17,11 @@
         </h:panelGrid>
         
         <p:outputPanel layout="block" id="monitoringPanel">
-           
-            <h:panelGrid columns="2" rendered="#{not empty managerMBean.servers}">
-            <ui:repeat var="s" value="#{managerMBean.servers}">
+            <p:poll listener="#{managerMBean.doMonitoring}"  update="mainForm:monitoringPanel"/>
+                <p:dataGrid rendered="#{not empty managerMBean.servers}" columns="2" value="#{managerMBean.servers}" var="s">   
                   <p:panel  header="#{s.info.name}" style="width: 370px;overflow: auto;font-size: 11px" styleClass="monitoringPanel ui-panel-title" >
                      <f:facet name="actions">  
-                         <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{managerMBean.doServerMoniring(s)}" >  
+                         <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{managerMBean.doServerMoniring(s)}" oncomplete="alert('call')" update="@form">  
                             <h:outputText styleClass="ui-icon ui-icon-help" />  
                         </p:commandLink>  
                     </f:facet>  
@@ -48,9 +47,16 @@
                             <h:outputLabel for="activeThreads" value="Active Threads:" style="font-weight: bold"/>
                             <h:outputText id="activeThreads" value="#{s.info.activeThreads}"/>
                         </h:panelGrid>
+                      <p:dataTable rendered="#{not empty s.applications}" value="#{s.applications}" var="a">
+                          <f:facet name="header">
+                              Deployed Applications 
+                          </f:facet>
+                          <p:column  headerText="Name">
+                              #{a.info.name}
+                          </p:column>
+                      </p:dataTable>
                     </p:panel>
-                 </ui:repeat>
-                </h:panelGrid>
+                </p:dataGrid>
         </p:outputPanel>
         
         <p:dialog header="Adding Server" widgetVar="blocker" modal="true" showEffect="fade" hideEffect="clip" height="100px" width="250px">

@@ -46,7 +46,7 @@ import org.snmp4j.smi.OID;
  * Usage:
  *
  * @Inject Instance<OID> serverName; will inject the serverName OID configured
- * in the serverfaces-mib.properties server.name = .1.3.6.1.2.1.1.1.0
+ * in the mib.properties server.name = .1.3.6.1.2.1.1.1.0
  *
  * Note that the name of the instance variable must match the name of the
  * properties key in camel case convention so for eg: server.name =
