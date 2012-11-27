@@ -75,5 +75,10 @@ public class WebLogicRetriever implements ServerRetriever{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public String getServerLog() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 
 }

@@ -69,9 +69,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getJSONObject("version");
             return result.getString("message");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverName:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverName:" + ex.getMessage());
         }
-        return null;
     }
     
 
@@ -82,9 +81,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getJSONObject("uptime");
             return result.getString("message");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverUptime:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverUptime:" + ex.getMessage());
         }
-        return null;
     }
 
     //SERVER SESSIONS
@@ -100,9 +98,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getMonitoringJSONObject("activesessionscurrent");
             return result.getString("current");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverActiveSessions:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverActiveSessions:" + ex.getMessage());
         }
-        return null;
     }
 
     //SERVER MEMORY
@@ -118,9 +115,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getMonitoringJSONObject("usedheapsize-count");
             return result.getString("count");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverUsedMemory:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverUsedMemory:" + ex.getMessage());
         }
-        return null;
     }
 
     /**
@@ -135,9 +131,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getMonitoringJSONObject("maxheapsize-count");
             return result.getString("count");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverAvaiableMemory:" + ex.getMessage());
+           throw new CouldNotRetrieveDataException("Could not retrieve serverAvaiableMemory:" + ex.getMessage());
         }
-        return null;
     }
 
     //SERVER CPU
@@ -160,9 +155,8 @@ public class GlassfishRetriever implements ServerRetriever {
                  return null;
             }
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverCpuTime:" + ex.getMessage());
+           throw new CouldNotRetrieveDataException("Could not retrieve serverCpuTime:" + ex.getMessage());
         }
-        return null;        
     }
 
     //SERVER TRANSACTIONS
@@ -178,9 +172,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getMonitoringJSONObject("activecount");
             return result.getString("count");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverActiveTransactions:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverActiveTransactions:" + ex.getMessage());
         }
-        return null;
     }
 
     /**
@@ -195,9 +188,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getMonitoringJSONObject("committedcount");
             return result.getString("count");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverCommitedTransactions:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverCommitedTransactions:" + ex.getMessage());
         }
-        return null;
     }
     
     /**
@@ -212,9 +204,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getMonitoringJSONObject("rolledbackcount");
             return result.getString("count");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverRollbackTransactions:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverRollbackTransactions:" + ex.getMessage());
         }
-        return null;
     }
 
     //SERVER THREADS
@@ -230,9 +221,8 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getMonitoringJSONObject("threadcount");
             return result.getString("count");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverActiveThreads:" + ex.getMessage());
+           throw new CouldNotRetrieveDataException("Could not retrieve serverActiveThreads:" + ex.getMessage());
         }
-        return null;
     }
 
     //SERVER REQUESTS
@@ -248,9 +238,13 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = getMonitoringJSONObject("requestcount");
             return result.getString("count");
         } catch (JSONException ex) {
-            log.error("Could not retrieve serverTotalRequests:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverTotalRequests:" + ex.getMessage());
         }
-        return null;
+    }
+    
+    @Override
+    public String getServerLog(){
+         return null;//TODO read server.log file
     }
 
     //utility methods
@@ -266,8 +260,10 @@ public class GlassfishRetriever implements ServerRetriever {
         try {
             JSONObject result = this.managementResource.path(name).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
             return result;
-        } catch (ClientHandlerException che) {
-            throw new CouldNotRetrieveDataException("problems trying to retrieve data from glassfish rest api,monitoring module levels may be OFF");
+        } catch (CouldNotRetrieveDataException cnrex) {
+            throw new CouldNotRetrieveDataException("problems trying to retrieve data from server:"+cnrex.getMessage() +" .Monitoring module levels may be OFF.");
+        }catch(Exception ex){
+           throw new CouldNotRetrieveDataException(ex.getMessage()); 
         }
     }
     
@@ -280,16 +276,15 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return JSONObject in glassfish monitoring API pattern
      * @throws UniformInterfaceException 
      */
-    JSONObject getMonitoringJSONObject(String name) throws UniformInterfaceException,JSONException {
-        try {
+    JSONObject getMonitoringJSONObject(String name) throws JSONException{
+        try{
             JSONObject result = this.managementResource.path(name).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
             return result.getJSONObject("extraProperties").getJSONObject("entity").getJSONObject(name);
-        } catch (ClientHandlerException che) {
-            throw new CouldNotRetrieveDataException("problems trying to retrieve data from glassfish rest api,monitoring module levels may be OFF");
-        } 
-        
+        }catch(UniformInterfaceException ue){
+            throw new CouldNotRetrieveDataException("Problems trying to access Glassfish REST API, make sure monitoring levels are ON");
+        }
+           
     }
-    
     
 
     JSONArray getJSONArray(String key) {

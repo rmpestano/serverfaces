@@ -17,6 +17,8 @@ import javax.inject.Named;
 import org.apache.log4j.Logger;
 import org.serverfaces.common.qualifier.Log;
 import org.serverfaces.manager.SNMPManager;
+import org.serverfaces.manager.model.Application;
+import org.serverfaces.manager.model.MonitorableResource;
 import org.serverfaces.manager.model.Server;
 import org.serverfaces.manager.util.MessagesController;
 import org.snmp4j.smi.OID;
@@ -32,6 +34,8 @@ public class ManagerMBean implements Serializable{
     
     private final int NUM_ALLOWED_SERVERS = 10;
     private String agentAddress;
+    private Server server;
+    
     @Inject @Log
     private transient Logger log;
     
@@ -131,10 +135,22 @@ public class ManagerMBean implements Serializable{
         this.agentAddress = agentAddress;
     }
 
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+    
+
     private boolean verifyAgentConection() {
           try{
               sNMPManager.setAgentAddress(agentAddress);
-              sNMPManager.getAsString(serverName.get());
+              String result = sNMPManager.getAsString(serverName.get());
+              if(result == null || "".equals(result)){
+                  return false;
+              }
               return true;
           }catch(Exception ex){
               return false;
@@ -163,5 +179,18 @@ public class ManagerMBean implements Serializable{
           server.getInfo().setTotalRequests(sNMPManager.getAsString(serverTotalRequests.get()));
           server.getInfo().setUptime(sNMPManager.getAsString(serverUptime.get()));
      }
+    
+    public void doApplicationMonitoring(Server s){
+        server = s;
+        Application a = new Application();
+        a.setInfo(new MonitorableResource());
+        a.getInfo().setName("App1");
+        Application a2 = new Application();
+        a2.setInfo(new MonitorableResource());
+        a2.getInfo().setName("App2");
+        server.getApplications().add(a2);
+        server.getApplications().add(a);
+        //TODO get app info via snmp
+    }
     
 }

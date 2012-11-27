@@ -78,6 +78,8 @@ public class TestAgent {
     Instance<OID> serverActiveThreads;//same as -> new OID(".1.3.6.1.2.1.1.10.0")
     @Inject
     Instance<OID> serverTotalRequests;//same as -> new OID(".1.3.6.1.2.1.1.11.0")
+    @Inject
+    Instance<OID> serverLog;    //same as -> new OID(".1.3.6.1.2.1.1.12.0")
 
     @Deployment
     public static Archive<?> createTestArchive() {
@@ -174,6 +176,13 @@ public class TestAgent {
         String serverTotalRequestsValue = snmpManager.getAsString(this.serverTotalRequests.get());
         this.validateSNMPGet(serverTotalRequestsValue);
         log.info("Server total requests: "+serverTotalRequestsValue);
+    }
+    
+    @Test
+    public void getServerLogResultNotNullAndExistingObject() throws IOException {
+        String serverLogValue = snmpManager.getAsString(this.serverLog.get());
+        this.validateSNMPGet(serverLogValue);
+        log.info("Server Log: "+serverLogValue);
     }
 
     /**

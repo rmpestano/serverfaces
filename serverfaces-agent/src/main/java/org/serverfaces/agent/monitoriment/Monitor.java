@@ -20,7 +20,6 @@
  */
 package org.serverfaces.agent.monitoriment;
 
-import org.serverfaces.agent.mib.MIBManager;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Lock;
@@ -30,9 +29,12 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.serverfaces.agent.SNMPAgent;
+import org.serverfaces.agent.event.InitMibEvent;
+import org.serverfaces.agent.event.UpdateMibEvent;
 import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.util.Constants;
 import org.serverfaces.common.qualifier.Log;
@@ -48,42 +50,38 @@ import org.snmp4j.smi.OctetString;
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class Monitor {
 
-    @Inject @Log
-    Logger log;
-    
-    @Inject 
-    private SNMPAgent agent;
-
     @Inject
-    private MIBManager mibManager;
-    
-    boolean started;
-    
-    
+    @Log
+    Logger log;
+    @Inject
+    private SNMPAgent agent;
+    @Inject
+    Event<InitMibEvent> initMib;
+    @Inject
+    Event<UpdateMibEvent> updateMib;
+
     @PostConstruct
     public void startup() {
         try {
             log.debug("SNMP agent is starting...");
-            
+            //TODO fire CDI event to starup agent
             agent.start();
+            initMib.fire(new InitMibEvent(agent.getServer(), agent.getDefaultContext()));
             // Since BaseAgent registers some MIBs by default we need to unregister
             // one before we register our own sysDescr.
-            agent.unregisterManagedObject(agent.getSnmpv2MIB());
-            agent.setDefaultContext(new OctetString("public"));
-            mibManager.initMIB();
             log.debug("SNMP agent started successfully.");
-            started = true;
-        } catch(CouldNotRetrieveDataException retrieveEX){
-            //if agent cannot retrieve data from the server it doest make sense do be monitoring
-            log.error("Agent is going to be stopped due to the following error:"+retrieveEX.getMessage());
-            this.terminate();
-        }catch(java.net.BindException be){
-              //address already in use
+        } catch (CouldNotRetrieveDataException retrieveEX) {
+            log.error("Agent is going to be stopped due to the following error:" + retrieveEX.getMessage() + ".\nYou can try to resolve the problem and start agent later via web interface");
+            if (agent != null && agent.getSession() != null) {
+                agent.stop();
+            }
+        } catch (java.net.BindException be) {
+            //address already in use
             log.error("Could not start SNMP Agent due to the following error:" + be.getMessage());
         } catch (Exception ex) {
             log.error("Could not start SNMP Agent due to the following error:" + ex.getMessage());
             this.terminate();
-            ex.printStackTrace(); 
+            ex.printStackTrace();
         }
 
 
@@ -93,26 +91,27 @@ public class Monitor {
     @PreDestroy
     public void terminate() {
         log.debug("Stopping SNMP agent...");
-        if(agent != null && agent.getSession() != null){
-          agent.stop();   
+        //TODO fire CDI event to stop agent
+        if (agent != null && agent.getSession() != null) {
+            agent.stop();
         }
-        agent = null;
         log.debug("SNMP Agent stopped successfully.");
     }
 
     @Schedule(hour = "*", minute = "*", second = Constants.MONITORING_INTERVAL)
     public void doMonitoring() {
-        if(!started){
-            throw new RuntimeException("Agent is not started, monitoriment will be cancelled.");
+        if (!agent.isRunning()) {
+            log.debug("Nothing to monitor, Agent is not started.");
+            return;
         }
         log.debug("Starting SNMP monitoriment...");
-        try{
-            mibManager.updateMIB();
-        }catch(CouldNotRetrieveDataException ex){
-            log.error("Agent is going to be stopped due to the following error:"+ex.getMessage());
+        try {
+            updateMib.fire(new UpdateMibEvent());
+        } catch (CouldNotRetrieveDataException ex) {
+            log.error("Agent is going to be stopped due to the following error:" + ex.getMessage());
             this.terminate();
         }
-        
+
         log.debug("Finished SNMP monitoriment, mib is now updated...");
     }
 }

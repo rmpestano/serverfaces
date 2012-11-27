@@ -87,6 +87,7 @@ public class OIDProvider {
         this.provider.put("serverRollbackTransactions", new OID(mib.getProperty(Enums.MIB.SERVER_ROLLBACK_TRANSACTIONS.value)));
         this.provider.put("serverActiveThreads", new OID(mib.getProperty(Enums.MIB.SERVER_ACTIVE_THREADS.value)));
         this.provider.put("serverTotalRequests", new OID(mib.getProperty(Enums.MIB.SERVER_TOTAL_REQUESTS.value)));
+        this.provider.put("serverLog", new OID(mib.getProperty(Enums.MIB.SERVER_LOG.value)));
         log.debug("OID Provider Initialized!");
     }
 

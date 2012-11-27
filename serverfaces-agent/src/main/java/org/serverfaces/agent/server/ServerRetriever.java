@@ -99,4 +99,10 @@ public interface ServerRetriever {
      * @return cumulative number of requests processed so far
      */
     String getServerTotalRequests();
+    
+    /**
+     *
+     * @return cumulative number of requests processed so far
+     */
+    String getServerLog();
 }

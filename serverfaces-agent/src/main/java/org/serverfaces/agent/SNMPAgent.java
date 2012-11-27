@@ -23,13 +23,19 @@ package org.serverfaces.agent;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import javax.enterprise.inject.Instance;
+import javax.annotation.PostConstruct;
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.apache.log4j.Logger;
+import org.serverfaces.agent.event.UnregisterMOsEvent;
+import org.serverfaces.common.qualifier.Log;
 
 import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.BaseAgent;
 import org.snmp4j.agent.CommandProcessor;
+import org.snmp4j.agent.DefaultMOServer;
 import org.snmp4j.agent.DuplicateRegistrationException;
 import org.snmp4j.agent.MOGroup;
 import org.snmp4j.agent.ManagedObject;
@@ -60,12 +66,20 @@ import org.snmp4j.transport.TransportMappings;
 public class SNMPAgent extends BaseAgent implements Serializable {
 
     @Inject
-    private Instance<String> agentAddress;
+    private String agentAddress;
+    @Inject @Log Logger log;
+    
+    
 
     public SNMPAgent() {
         super(new File("conf.agent"), new File("bootCounter.agent"),
                 new CommandProcessor(
                 new OctetString(MPv3.createLocalEngineID())));
+    }
+    
+    @PostConstruct
+    public void startup(){
+        log.debug("Agent constructed!");
     }
  
     
@@ -132,7 +146,7 @@ public class SNMPAgent extends BaseAgent implements Serializable {
      */
     @Override
     protected void unregisterManagedObjects() {
-        // TODO Auto-generated method stub
+         
     }
 
     /**
@@ -153,7 +167,7 @@ public class SNMPAgent extends BaseAgent implements Serializable {
          * where protocol = udp/tcp,
          * eg: udp:127.0.0.1/16112
          */
-        Address addr = GenericAddress.parse(agentAddress.get());
+        Address addr = GenericAddress.parse(getAgentAddress());
         TransportMapping tm = TransportMappings.getInstance()
                 .createTransportMapping(addr);
         transportMappings[0] = tm;
@@ -168,7 +182,7 @@ public class SNMPAgent extends BaseAgent implements Serializable {
     public void start() throws IOException {
         
           init();  
-      
+       
         
         // This method reads some old config from a file and causes
         // unexpected behavior.
@@ -178,7 +192,15 @@ public class SNMPAgent extends BaseAgent implements Serializable {
         finishInit();
         run();
         sendColdStartNotification();
+//        this.unregisterManagedObject(this.getSnmpv2MIB());
+        this.setDefaultContext(new OctetString("public"));
     }
+
+    @Override
+    protected void registerSnmpMIBs() {
+//        super.registerSnmpMIBs();
+    }
+    
 
     /**
      * Clients can register the MO they need
@@ -193,6 +215,44 @@ public class SNMPAgent extends BaseAgent implements Serializable {
 
     public void unregisterManagedObject(MOGroup moGroup) {
         moGroup.unregisterMOs(server, getContext(moGroup));
+    }
+    
+    public void unregisterManagedObject(@Observes UnregisterMOsEvent unregisterMOsEvent) {
+        System.out.println("Calling observer@@");
+        MOGroup moGroup = unregisterMOsEvent.getMoGroup();
+        moGroup.unregisterMOs(server, getContext(moGroup));
+    }
+
+
+    public String getAgentAddress() {
+        return agentAddress;
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        unregisterManagedObjects();
+    }
+
+    @Override
+    @Produces
+    public OctetString getDefaultContext() {
+        return super.getDefaultContext();
+    }
+
+    @Override
+    @Produces
+    public DefaultMOServer getServer() {
+        return super.getServer();
+    }
+    
+
+    public void setAgentAddress(String agentAddress) {
+        this.agentAddress = agentAddress;
+    }
+    
+    public boolean isRunning(){
+        return (this.getAgentState() == SNMPAgent.STATE_RUNNING);
     }
     
 }
