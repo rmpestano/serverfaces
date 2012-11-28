@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.serverfaces.manager.model;
 
 import java.io.Serializable;
@@ -11,23 +10,25 @@ import javax.persistence.Embeddable;
 /**
  *
  * @author Rafael M. Pestano - Nov 18, 2012 9:12:58 PM
- * 
- * Represents a manageable resource in the context of a web server(mainly applications and server itself)
+ *
+ * Represents a manageable resource in the context of a web server(mainly
+ * applications and server itself)
  */
 @Embeddable
-public class MonitorableResource implements Serializable{
-    
+public class MonitorableResource implements Serializable {
+
     private String name;
     private String uptime;
-    private String activeSessions;
-    private String usedMemory;
-    private String availableMemory;
-    private String cpuTime;
-    private String activeTransactions;
-    private String commitedTransactions;
-    private String rollbackTransactions;
-    private String activeThreads;
-    private String totalRequests;
+    private Integer activeSessions;
+    private Integer usedMemory;
+    private Integer availableMemory;
+    private Integer cpuTime;
+    private Integer activeTransactions;
+    private Integer commitedTransactions;
+    private Integer rollbackTransactions;
+    private Integer activeThreads;
+    private Long totalRequests;
+    private String log;
 
     public String getName() {
         return name;
@@ -45,77 +46,83 @@ public class MonitorableResource implements Serializable{
         this.uptime = uptime;
     }
 
-    public String getActiveSessions() {
+    public Integer getActiveSessions() {
         return activeSessions;
     }
 
-    public void setActiveSessions(String activeSessions) {
+    public void setActiveSessions(Integer activeSessions) {
         this.activeSessions = activeSessions;
     }
 
-    public String getAvailableMemory() {
-        return availableMemory;
-    }
-
-    public void setAvailableMemory(String availableMemory) {
-        this.availableMemory = availableMemory;
-    }
-
-    public String getUsedMemory() {
+    public Integer getUsedMemory() {
         return usedMemory;
     }
 
-    public void setUsedMemory(String usedMemory) {
+    public void setUsedMemory(Integer usedMemory) {
         this.usedMemory = usedMemory;
     }
 
-    public String getCpuTime() {
+    public Integer getAvailableMemory() {
+        return availableMemory;
+    }
+
+    public void setAvailableMemory(Integer availableMemory) {
+        this.availableMemory = availableMemory;
+    }
+
+    public Integer getCpuTime() {
         return cpuTime;
     }
 
-    public void setCpuTime(String cpuTime) {
+    public void setCpuTime(Integer cpuTime) {
         this.cpuTime = cpuTime;
     }
 
-    public String getActiveTransactions() {
+    public Integer getActiveTransactions() {
         return activeTransactions;
     }
 
-    public void setActiveTransactions(String activeTransactions) {
+    public void setActiveTransactions(Integer activeTransactions) {
         this.activeTransactions = activeTransactions;
     }
 
-    public String getCommitedTransactions() {
+    public Integer getCommitedTransactions() {
         return commitedTransactions;
     }
 
-    public void setCommitedTransactions(String commitedTransactions) {
+    public void setCommitedTransactions(Integer commitedTransactions) {
         this.commitedTransactions = commitedTransactions;
     }
 
-    public String getRollbackTransactions() {
+    public Integer getRollbackTransactions() {
         return rollbackTransactions;
     }
 
-    public void setRollbackTransactions(String rollbackTransactions) {
+    public void setRollbackTransactions(Integer rollbackTransactions) {
         this.rollbackTransactions = rollbackTransactions;
     }
 
-    public String getActiveThreads() {
+    public Integer getActiveThreads() {
         return activeThreads;
     }
 
-    public void setActiveThreads(String activeThreads) {
+    public void setActiveThreads(Integer activeThreads) {
         this.activeThreads = activeThreads;
     }
 
-    public String getTotalRequests() {
+    public Long getTotalRequests() {
         return totalRequests;
     }
 
-    public void setTotalRequests(String totalRequests) {
+    public void setTotalRequests(Long totalRequests) {
         this.totalRequests = totalRequests;
     }
-    
 
+    public String getLog() {
+        return log;
+    }
+
+    public void setLog(String log) {
+        this.log = log;
+    }
 }

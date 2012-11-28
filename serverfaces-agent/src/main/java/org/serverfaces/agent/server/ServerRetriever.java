@@ -48,57 +48,57 @@ public interface ServerRetriever {
      *
      * @return number of active sessions
      */
-    String getServerActiveSessions();
+    Integer getServerActiveSessions();
 
     /**
      *
      * @return amount of used memory in bytes.
      */
-    String getServerUsedMemory();
+    Integer getServerUsedMemory();
 
     /**
      *
      * @return amount of available memory in bytes.
      */
-    String getServerAvailableMemory();
+    Integer getServerAvailableMemory();
 
     /**
      *
      * @return returns the total CPU time for the current server thread in
      * microseconds(ms)
      */
-    String getServerCpuTime();
+    Integer getServerCpuTime();
 
     /**
      *
      * @return number of transactions that are currently active.
      */
-    String getServerActiveTransactions();
+    Integer getServerActiveTransactions();
 
     /**
      *
      * @return number of transactions that have been committed.
      */
-    String getServerCommitedTransactions();
+    Integer getServerCommitedTransactions();
 
     /**
      *
      * @return number of transactions that have been rolled back.
      */
-    String getServerRollbackTransactions();
+    Integer getServerRollbackTransactions();
 
     /**
      *
      * @return current number of live threads including both daemon and
      * non-daemon threads.
      */
-    String getServerActiveThreads();
+    Integer getServerActiveThreads();
 
     /**
      *
      * @return cumulative number of requests processed so far
      */
-    String getServerTotalRequests();
+    Long getServerTotalRequests();
     
     /**
      *

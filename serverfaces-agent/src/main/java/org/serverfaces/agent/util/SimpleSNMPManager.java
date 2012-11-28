@@ -23,6 +23,7 @@ import org.snmp4j.smi.GenericAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
+import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
@@ -84,6 +85,26 @@ public class SimpleSNMPManager {
         PDU pdu = event.getResponse();
         if(pdu != null){
             return pdu.get(0).getVariable().toString();
+        }
+        return null;
+    }
+    
+     public Long getAsLong(OID oid) throws IOException {
+        ResponseEvent event = get(new OID[]{oid});
+        PDU pdu = event.getResponse();
+        if(pdu != null){
+            Variable var = pdu.get(0).getVariable();
+            return (var != null ? var.toLong(): null);
+        }
+        return null;
+    }
+    
+     public Integer getAsInt(OID oid) throws IOException {
+        ResponseEvent event = get(new OID[]{oid});
+        PDU pdu = event.getResponse();
+        if(pdu != null){
+            Variable var = pdu.get(0).getVariable();
+            return (var != null ? var.toInt(): null);
         }
         return null;
     }

@@ -18,10 +18,10 @@ public class TomEERetriever implements ServerRetriever {
     public String getServerName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     @Override
     public String getServerAddress() {
-       throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -30,47 +30,47 @@ public class TomEERetriever implements ServerRetriever {
     }
 
     @Override
-    public String getServerActiveSessions() {
+    public Integer getServerActiveSessions() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getServerUsedMemory() {
+    public Integer getServerUsedMemory() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getServerAvailableMemory() {
+    public Integer getServerAvailableMemory() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getServerCpuTime() {
+    public Integer getServerCpuTime() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getServerActiveTransactions() {
+    public Integer getServerActiveTransactions() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getServerCommitedTransactions() {
+    public Integer getServerCommitedTransactions() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getServerRollbackTransactions() {
+    public Integer getServerRollbackTransactions() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getServerActiveThreads() {
+    public Integer getServerActiveThreads() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getServerTotalRequests() {
+    public Long getServerTotalRequests() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -78,4 +78,6 @@ public class TomEERetriever implements ServerRetriever {
     public String getServerLog() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    
 }

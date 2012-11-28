@@ -79,11 +79,6 @@ public class ManagerMBean implements Serializable{
 
     public void addServer(){
         try {
-            //TODO remove this restriction after adding dynaForm in server.xhml
-            if(getNumMonitoredServers() == NUM_ALLOWED_SERVERS){
-                messages.addError("You cannot manage more then 10 servers!");
-                return;
-            }
             if(this.serverAlreadyMonitored(agentAddress)){
                 messages.addError("Could not add server because its already being monitored!");
                 return;
@@ -168,15 +163,15 @@ public class ManagerMBean implements Serializable{
     public void doServerMoniring(Server server) throws IOException {
           sNMPManager.setAgentAddress(server.getAgentAddress());
           server.getInfo().setName(sNMPManager.getAsString(serverName.get()));
-          server.getInfo().setActiveSessions(sNMPManager.getAsString(serverActiveSessions.get()));
-          server.getInfo().setActiveThreads(sNMPManager.getAsString(serverActiveThreads.get()));
-          server.getInfo().setActiveTransactions(sNMPManager.getAsString(serverActiveTransactions.get()));
-          server.getInfo().setAvailableMemory(sNMPManager.getAsString(serverAvailableMemory.get()));
-          server.getInfo().setUsedMemory(sNMPManager.getAsString(serverUsedMemory.get()));
-          server.getInfo().setCommitedTransactions(sNMPManager.getAsString(serverCommitedTransactions.get()));
-          server.getInfo().setCpuTime(sNMPManager.getAsString(serverCpuTime.get()));
-          server.getInfo().setRollbackTransactions(sNMPManager.getAsString(serverRollbackTransactions.get()));
-          server.getInfo().setTotalRequests(sNMPManager.getAsString(serverTotalRequests.get()));
+          server.getInfo().setActiveSessions(sNMPManager.getAsInt(serverActiveSessions.get()));
+          server.getInfo().setActiveThreads(sNMPManager.getAsInt(serverActiveThreads.get()));
+          server.getInfo().setActiveTransactions(sNMPManager.getAsInt(serverActiveTransactions.get()));
+          server.getInfo().setAvailableMemory(sNMPManager.getAsInt(serverAvailableMemory.get()));
+          server.getInfo().setUsedMemory(sNMPManager.getAsInt(serverUsedMemory.get()));
+          server.getInfo().setCommitedTransactions(sNMPManager.getAsInt(serverCommitedTransactions.get()));
+          server.getInfo().setCpuTime(sNMPManager.getAsInt(serverCpuTime.get()));
+          server.getInfo().setRollbackTransactions(sNMPManager.getAsInt(serverRollbackTransactions.get()));
+          server.getInfo().setTotalRequests(sNMPManager.getAsLong(serverTotalRequests.get()));
           server.getInfo().setUptime(sNMPManager.getAsString(serverUptime.get()));
      }
     

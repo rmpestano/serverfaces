@@ -35,6 +35,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.server.ServerRetriever;
 import org.serverfaces.common.qualifier.Log;
+import org.snmp4j.smi.Variable;
 
 /**
  *
@@ -56,12 +57,11 @@ public class GlassfishRetriever implements ServerRetriever {
     }
 
     //SERVER BASIC INFO
-    
     @Override
     public String getServerAddress() {
         return serverAddress.get();
     }
-    
+
     @Override
     public String getServerName() {
         managementResource = this.restClient.resource(getRestManagementURI());
@@ -72,7 +72,6 @@ public class GlassfishRetriever implements ServerRetriever {
             throw new CouldNotRetrieveDataException("Could not retrieve serverName:" + ex.getMessage());
         }
     }
-    
 
     @Override
     public String getServerUpTime() {
@@ -92,11 +91,12 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public String getServerActiveSessions() {
+    public Integer getServerActiveSessions() {
         try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "web/session/");
             JSONObject result = getMonitoringJSONObject("activesessionscurrent");
-            return result.getString("current");
+            Integer value = result.getInt("current");
+            return value != null ? value : 0;
         } catch (JSONException ex) {
             throw new CouldNotRetrieveDataException("Could not retrieve serverActiveSessions:" + ex.getMessage());
         }
@@ -109,11 +109,12 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public String getServerUsedMemory() {
+    public Integer getServerUsedMemory() {
         try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "jvm/memory/");
             JSONObject result = getMonitoringJSONObject("usedheapsize-count");
-            return result.getString("count");
+            Integer value = result.getInt("count");
+            return value != null ? value : 0;
         } catch (JSONException ex) {
             throw new CouldNotRetrieveDataException("Could not retrieve serverUsedMemory:" + ex.getMessage());
         }
@@ -125,13 +126,14 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public String getServerAvailableMemory() {
-         try {
+    public Integer getServerAvailableMemory() {
+        try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "jvm/memory/");
             JSONObject result = getMonitoringJSONObject("maxheapsize-count");
-            return result.getString("count");
+            Integer value = result.getInt("count");
+            return value != null ? value : 0;
         } catch (JSONException ex) {
-           throw new CouldNotRetrieveDataException("Could not retrieve serverAvaiableMemory:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverAvaiableMemory:" + ex.getMessage());
         }
     }
 
@@ -142,20 +144,20 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public String getServerCpuTime() {
-         try {
+    public Integer getServerCpuTime() {
+        try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "jvm/thread-system/");
             JSONObject result = getMonitoringJSONObject("currentthreadcputime");
             Long resultInNano = result.getLong("count");
             //the result must be in ms as specified by ServerRetriever contract
-            if(resultInNano != null){
-                Long resultInMicro = new Long(resultInNano/1000000L);
-                return resultInMicro.toString();
-            } else{
-                 return null;
+            if (resultInNano != null) {
+                Long resultInMicro = new Long(resultInNano / 1000000L);
+                return resultInMicro.intValue();
+            } else {
+                return 0;
             }
         } catch (JSONException ex) {
-           throw new CouldNotRetrieveDataException("Could not retrieve serverCpuTime:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverCpuTime:" + ex.getMessage());
         }
     }
 
@@ -166,11 +168,12 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public String getServerActiveTransactions() {
-         try {
+    public Integer getServerActiveTransactions() {
+        try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "transaction-service/");
             JSONObject result = getMonitoringJSONObject("activecount");
-            return result.getString("count");
+            Integer value = result.getInt("count");
+            return value != null ? value : 0;
         } catch (JSONException ex) {
             throw new CouldNotRetrieveDataException("Could not retrieve serverActiveTransactions:" + ex.getMessage());
         }
@@ -182,27 +185,29 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public String getServerCommitedTransactions() {
-       try {
+    public Integer getServerCommitedTransactions() {
+        try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "transaction-service/");
             JSONObject result = getMonitoringJSONObject("committedcount");
-            return result.getString("count");
+            Integer value = result.getInt("count");
+            return value != null ? value : 0;
         } catch (JSONException ex) {
             throw new CouldNotRetrieveDataException("Could not retrieve serverCommitedTransactions:" + ex.getMessage());
         }
     }
-    
+
     /**
      * URI: /monitoring/domain/server/transaction-service/rolledbackcount
      *
      * @return
      */
     @Override
-    public String getServerRollbackTransactions() {
+    public Integer getServerRollbackTransactions() {
         try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "transaction-service/");
             JSONObject result = getMonitoringJSONObject("rolledbackcount");
-            return result.getString("count");
+            Integer value = result.getInt("count");
+            return value != null ? value : 0;
         } catch (JSONException ex) {
             throw new CouldNotRetrieveDataException("Could not retrieve serverRollbackTransactions:" + ex.getMessage());
         }
@@ -215,13 +220,14 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public String getServerActiveThreads() {
-         try {
+    public Integer getServerActiveThreads() {
+        try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "jvm/thread-system/");
             JSONObject result = getMonitoringJSONObject("threadcount");
-            return result.getString("count");
+            Integer value = result.getInt("count");
+            return value != null ? value : 0;
         } catch (JSONException ex) {
-           throw new CouldNotRetrieveDataException("Could not retrieve serverActiveThreads:" + ex.getMessage());
+            throw new CouldNotRetrieveDataException("Could not retrieve serverActiveThreads:" + ex.getMessage());
         }
     }
 
@@ -232,19 +238,20 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public String getServerTotalRequests() {
+    public Long getServerTotalRequests() {
         try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "web/request/");
             JSONObject result = getMonitoringJSONObject("requestcount");
-            return result.getString("count");
+            Long value = result.getLong("count");
+            return value != null ? value : 0;
         } catch (JSONException ex) {
             throw new CouldNotRetrieveDataException("Could not retrieve serverTotalRequests:" + ex.getMessage());
         }
     }
-    
+
     @Override
-    public String getServerLog(){
-         return null;//TODO read server.log file
+    public String getServerLog() {
+        return null;//TODO read server.log file
     }
 
     //utility methods
@@ -261,31 +268,30 @@ public class GlassfishRetriever implements ServerRetriever {
             JSONObject result = this.managementResource.path(name).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
             return result;
         } catch (CouldNotRetrieveDataException cnrex) {
-            throw new CouldNotRetrieveDataException("problems trying to retrieve data from server:"+cnrex.getMessage() +" .Monitoring module levels may be OFF.");
-        }catch(Exception ex){
-           throw new CouldNotRetrieveDataException(ex.getMessage()); 
+            throw new CouldNotRetrieveDataException("problems trying to retrieve data from server:" + cnrex.getMessage() + " .Monitoring module levels may be OFF.");
+        } catch (Exception ex) {
+            throw new CouldNotRetrieveDataException(ex.getMessage());
         }
     }
-    
+
     /**
-     * glassfish monitoring API has the folowing pattern
-     * objectName ->{extra-properties}->{entity}->{objectName}->property
-     * 
-     * 
+     * glassfish monitoring API has the folowing pattern objectName
+     * ->{extra-properties}->{entity}->{objectName}->property
+     *
+     *
      * @param name
      * @return JSONObject in glassfish monitoring API pattern
-     * @throws UniformInterfaceException 
+     * @throws UniformInterfaceException
      */
-    JSONObject getMonitoringJSONObject(String name) throws JSONException{
-        try{
+    JSONObject getMonitoringJSONObject(String name) throws JSONException {
+        try {
             JSONObject result = this.managementResource.path(name).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
             return result.getJSONObject("extraProperties").getJSONObject("entity").getJSONObject(name);
-        }catch(UniformInterfaceException ue){
+        } catch (UniformInterfaceException ue) {
             throw new CouldNotRetrieveDataException("Problems trying to access Glassfish REST API, make sure monitoring levels are ON");
         }
-           
+
     }
-    
 
     JSONArray getJSONArray(String key) {
         try {
@@ -295,5 +301,4 @@ public class GlassfishRetriever implements ServerRetriever {
             throw new CouldNotRetrieveDataException("problems trying to retrieve data from glassfish rest api,monitoring module levels may be OFF");
         }
     }
-
 }

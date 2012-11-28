@@ -53,11 +53,11 @@ public class MOCreator {
         if (value instanceof String) {
             return new OctetString((String) value);
         }
-        if (value instanceof Long) {
-            return new Gauge32((Long) value);
-        }
         if (value instanceof Integer) {
-            return new Counter64(((Integer) value).longValue());
+            return new Gauge32(((Integer) value).longValue());
+        }
+        if (value instanceof Long) {
+            return new Counter64(((Long) value));
         }
         
         throw new IllegalArgumentException("Unmanaged Type: " + value.getClass());

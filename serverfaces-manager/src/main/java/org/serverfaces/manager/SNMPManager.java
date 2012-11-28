@@ -19,37 +19,35 @@ import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 /**
  *
  * @author Rafael M. Pestano - Nov 16, 2012 5:12:20 PM
- * 
+ *
  * the guy who communicates with agent via SNMP protocol
  */
 @Singleton
-public class SNMPManager implements Serializable{
+public class SNMPManager implements Serializable {
 
     private Snmp snmp = null;
-    
     private String agentAddress;
-    
     private TransportMapping transport;
 
     public SNMPManager() {
     }
 
-    
-    public TransportMapping getTransport() throws IOException{
-        if(transport == null){
-                transport =  new DefaultUdpTransportMapping();
+    public TransportMapping getTransport() throws IOException {
+        if (transport == null) {
+            transport = new DefaultUdpTransportMapping();
         }
-       return transport;     
+        return transport;
     }
-    
+
     @PostConstruct
-    public void initManager() throws IOException{
+    public void initManager() throws IOException {
         this.start();
     }
 
@@ -65,8 +63,8 @@ public class SNMPManager implements Serializable{
         // Do not forget this line!
         getTransport().listen();
     }
-    
-    public void stop() throws IOException{
+
+    public void stop() throws IOException {
         getTransport().close();
         snmp = null;
     }
@@ -82,8 +80,28 @@ public class SNMPManager implements Serializable{
     public String getAsString(OID oid) throws IOException {
         ResponseEvent event = get(new OID[]{oid});
         PDU pdu = event.getResponse();
-        if(pdu != null){
+        if (pdu != null) {
             return pdu.get(0).getVariable().toString();
+        }
+        return null;
+    }
+
+    public Long getAsLong(OID oid) throws IOException {
+        ResponseEvent event = get(new OID[]{oid});
+        PDU pdu = event.getResponse();
+        if (pdu != null) {
+            Variable var = pdu.get(0).getVariable();
+            return (var != null ? var.toLong() : null);
+        }
+        return null;
+    }
+
+    public Integer getAsInt(OID oid) throws IOException {
+        ResponseEvent event = get(new OID[]{oid});
+        PDU pdu = event.getResponse();
+        if (pdu != null) {
+            Variable var = pdu.get(0).getVariable();
+            return (var != null ? var.toInt() : null);
         }
         return null;
     }
@@ -134,5 +152,4 @@ public class SNMPManager implements Serializable{
     public void setAgentAddress(String agentAddress) {
         this.agentAddress = agentAddress;
     }
-    
 }

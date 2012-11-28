@@ -117,63 +117,63 @@ public class TestAgent {
 
     @Test
     public void getServerActiveSessionsResultNotNullAndExistingObject() throws IOException {
-        String serverActiveSessionsValue = snmpManager.getAsString(this.serverActiveSessions.get());
+        Integer serverActiveSessionsValue = snmpManager.getAsInt(this.serverActiveSessions.get());
         this.validateSNMPGet(serverActiveSessionsValue);
         log.info("Server active sessions: "+serverActiveSessionsValue);
     }
 
     @Test
     public void getServerUsedMemoryResultNotNullAndExistingObject() throws IOException {
-        String serverUsedMemoryValue = snmpManager.getAsString(this.serverUsedMemory.get());
+        Integer serverUsedMemoryValue = snmpManager.getAsInt(this.serverUsedMemory.get());
         this.validateSNMPGet(serverUsedMemoryValue);
         log.info("Server used memory(bytes): "+serverUsedMemoryValue);
     }
 
     @Test
     public void getServerAvailableMemoryResultNotNullAndExistingObject() throws IOException {
-        String serverAvailableMemoryValue = snmpManager.getAsString(this.serverAvailableMemory.get());
+        Integer serverAvailableMemoryValue = snmpManager.getAsInt(this.serverAvailableMemory.get());
         this.validateSNMPGet(serverAvailableMemoryValue);
         log.info("Server available memory(bytes): "+serverAvailableMemoryValue);
     }
 
     @Test
     public void getServerCpuTimeResultNotNullAndExistingObject() throws IOException {
-        String serverCpuTimeValue = snmpManager.getAsString(this.serverCpuTime.get());
+        Integer serverCpuTimeValue = snmpManager.getAsInt(this.serverCpuTime.get());
         this.validateSNMPGet(serverCpuTimeValue);
         log.info("Server cpu time(ms): "+serverCpuTimeValue);
     }
     
     @Test
     public void getServerActiveTransactionsResultNotNullAndExistingObject() throws IOException {
-        String serverActiveTransactionsValue = snmpManager.getAsString(this.serverActiveTransactions.get());
+        Integer serverActiveTransactionsValue = snmpManager.getAsInt(this.serverActiveTransactions.get());
         this.validateSNMPGet(serverActiveTransactionsValue);
         log.info("Server active transactions: "+serverActiveTransactionsValue);
     }
     
     @Test
     public void getServerCommitedTransactionsResultNotNullAndExistingObject() throws IOException {
-        String serverCommitedTransactionsValue = snmpManager.getAsString(this.serverCommitedTransactions.get());
+        Integer serverCommitedTransactionsValue = snmpManager.getAsInt(this.serverCommitedTransactions.get());
         this.validateSNMPGet(serverCommitedTransactionsValue);
         log.info("Server commited transactions: "+serverCommitedTransactionsValue);
     }
     
     @Test
     public void getServerRollbackTransactionsResultNotNullAndExistingObject() throws IOException {
-        String serverRollbackTransactionsValue = snmpManager.getAsString(this.serverRollbackTransactions.get());
+        Integer serverRollbackTransactionsValue = snmpManager.getAsInt(this.serverRollbackTransactions.get());
         this.validateSNMPGet(serverRollbackTransactionsValue);
         log.info("Server rollback transactions: "+serverRollbackTransactionsValue);
     }
     
     @Test
     public void getServerActiveThreadsResultNotNullAndExistingObject() throws IOException {
-        String serverActiveThreadsValue = snmpManager.getAsString(this.serverActiveThreads.get());
+        Integer serverActiveThreadsValue = snmpManager.getAsInt(this.serverActiveThreads.get());
         this.validateSNMPGet(serverActiveThreadsValue);
         log.info("Server active threads: "+serverActiveThreadsValue);
     }
     
     @Test
     public void getServerTotalRequestsResultNotNullAndExistingObject() throws IOException {
-        String serverTotalRequestsValue = snmpManager.getAsString(this.serverTotalRequests.get());
+        Long serverTotalRequestsValue = snmpManager.getAsLong(this.serverTotalRequests.get());
         this.validateSNMPGet(serverTotalRequestsValue);
         log.info("Server total requests: "+serverTotalRequestsValue);
     }
@@ -191,7 +191,7 @@ public class TestAgent {
      *
      * @param getResult
      */
-    private void validateSNMPGet(String getResult) {
+    private void validateSNMPGet(Object getResult) {
         /**
          * result null usually occours when manager couldn't reach agent
          */

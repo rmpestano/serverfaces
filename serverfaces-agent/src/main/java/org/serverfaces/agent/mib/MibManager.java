@@ -45,6 +45,8 @@ import org.snmp4j.agent.MOGroup;
 import org.snmp4j.agent.MOServer;
 import org.snmp4j.agent.ManagedObject;
 import org.snmp4j.agent.mo.MOScalar;
+import org.snmp4j.smi.Counter64;
+import org.snmp4j.smi.Gauge32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
@@ -238,24 +240,30 @@ public class MibManager implements Serializable, MOGroup {
         OctetString uptime = new OctetString();
         uptime.setValue(serverRetriever.getServerUpTime());
         this.setScalar(getServerUptime(), uptime);
-        this.setScalar(getServerActiveSessions(), new OctetString(serverRetriever.getServerActiveSessions()));
-        this.setScalar(getServerUsedMemory(), new OctetString(serverRetriever.getServerUsedMemory()));
-        this.setScalar(getServerAvailableMemory(), new OctetString(serverRetriever.getServerAvailableMemory()));
-        this.setScalar(getServerCpuTime(), new OctetString(serverRetriever.getServerCpuTime()));
-        this.setScalar(getServerActiveTransactions(), new OctetString(serverRetriever.getServerActiveTransactions()));
-        this.setScalar(getServerCommitedTransactions(), new OctetString(serverRetriever.getServerCommitedTransactions()));
-        this.setScalar(getServerRollbackTransactions(), new OctetString(serverRetriever.getServerRollbackTransactions()));
-        this.setScalar(getServerActiveThreads(), new OctetString(serverRetriever.getServerActiveThreads()));
-        this.setScalar(getServerTotalRequests(), new OctetString(serverRetriever.getServerTotalRequests()));
+        this.setScalar(getServerActiveSessions(), new Gauge32(serverRetriever.getServerActiveSessions()));
+        this.setScalar(getServerUsedMemory(), new Gauge32(serverRetriever.getServerUsedMemory()));
+        this.setScalar(getServerAvailableMemory(), new Gauge32(serverRetriever.getServerAvailableMemory()));
+        this.setScalar(getServerCpuTime(), new Gauge32(serverRetriever.getServerCpuTime()));
+        this.setScalar(getServerActiveTransactions(), new Gauge32(serverRetriever.getServerActiveTransactions()));
+        this.setScalar(getServerCommitedTransactions(), new Gauge32(serverRetriever.getServerCommitedTransactions()));
+        this.setScalar(getServerRollbackTransactions(), new Gauge32(serverRetriever.getServerRollbackTransactions()));
+        this.setScalar(getServerActiveThreads(), new Gauge32(serverRetriever.getServerActiveThreads()));
+        this.setScalar(getServerTotalRequests(), new Counter64(serverRetriever.getServerTotalRequests()));
 //        this.setScalar(serverLog.get(), new OctetString(serverRetriever.getServerLog()));
     }
 
     public MOScalar findScalar(OID oid) {
-        return (MOScalar) getMoServer().getManagedObject(oid, getContext());
+        if(moServer != null){
+             return (MOScalar) getMoServer().getManagedObject(oid, getContext());
+        }
+       return null;
     }
 
     public void setScalar(OID oid, Variable value) {
-        findScalar(oid).setValue(value);
+        MOScalar scalar = findScalar(oid);
+        if(scalar != null){
+            scalar.setValue(value);
+        }
     }
 
     public ServerRetriever getServerRetriever() {
