@@ -112,7 +112,6 @@ public class MibManager implements Serializable, MOGroup {
      * register known OIDs in the management information base
      */
     public void initMIB(@Observes InitMibEvent initMibEvent) {
-            
             this.moServer = initMibEvent.getDefaultMOServer();
             this.context = initMibEvent.getDefaultContext();
             this.initMOs();

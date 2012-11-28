@@ -107,11 +107,17 @@ public class Monitor {
         log.debug("Starting SNMP monitoriment...");
         try {
             updateMib.fire(new UpdateMibEvent());
+            log.debug("Finished SNMP monitoriment, mib is now updated...");
         } catch (CouldNotRetrieveDataException ex) {
-            log.error("Agent is going to be stopped due to the following error:" + ex.getMessage());
+            log.error("Agent is going to be stopped due to the following error:" + ex.getMessage() + ". You can start it again through web interface.");
             this.terminate();
+        }catch(Exception ex){
+            log.error("Unexpected exception during monitoriment: "+ex.getMessage() + ". Agent will be stoped now, please start agent manualy through web interface");
+            this.terminate();
+            if(log.isDebugEnabled()){
+                ex.printStackTrace();
+            }
         }
 
-        log.debug("Finished SNMP monitoriment, mib is now updated...");
     }
 }

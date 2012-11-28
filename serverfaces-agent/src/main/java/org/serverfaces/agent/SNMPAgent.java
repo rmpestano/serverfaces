@@ -218,7 +218,6 @@ public class SNMPAgent extends BaseAgent implements Serializable {
     }
     
     public void unregisterManagedObject(@Observes UnregisterMOsEvent unregisterMOsEvent) {
-        System.out.println("Calling observer@@");
         MOGroup moGroup = unregisterMOsEvent.getMoGroup();
         moGroup.unregisterMOs(server, getContext(moGroup));
     }
