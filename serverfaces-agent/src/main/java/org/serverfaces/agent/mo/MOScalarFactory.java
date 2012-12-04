@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.serverfaces.agent.util;
+package org.serverfaces.agent.mo;
 
 import org.snmp4j.agent.mo.MOAccessImpl;
 import org.snmp4j.agent.mo.MOScalar;
@@ -32,7 +32,7 @@ import org.snmp4j.smi.Variable;
  *
  * @author Rafael M. Pestano
  */
-public class MOCreator {
+public class MOScalarFactory {
 
     public static MOScalar createReadOnly(OID oid, Object value) {
         return new MOScalar(oid,

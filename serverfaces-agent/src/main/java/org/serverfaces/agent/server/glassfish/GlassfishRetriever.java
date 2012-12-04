@@ -24,6 +24,8 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.util.Iterator;
+import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
@@ -35,7 +37,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.server.ServerRetriever;
 import org.serverfaces.common.qualifier.Log;
-import org.snmp4j.smi.Variable;
 
 /**
  *
@@ -246,6 +247,76 @@ public class GlassfishRetriever implements ServerRetriever {
             return value != null ? value : 0;
         } catch (JSONException ex) {
             throw new CouldNotRetrieveDataException("Could not retrieve serverTotalRequests:" + ex.getMessage());
+        }
+    }
+    
+    /**
+     * URI: /monitoring/domain/server/web/request/errorcount
+     *
+     * @return
+     */
+    @Override
+    public Long getServerErrors(){
+         try {
+            this.managementResource = this.restClient.resource(getRestMonitoringURI() + "web/request/");
+            JSONObject result = getMonitoringJSONObject("errorcount");
+            Long value = result.getLong("count");
+            return value != null ? value : 0;
+        } catch (JSONException ex) {
+            throw new CouldNotRetrieveDataException("Could not retrieve serverErrors:" + ex.getMessage());
+        }
+    }
+    
+    /**
+     * URI: /monitoring/domain/server/web/request/processingtime
+     *
+     * @return
+     */
+    @Override
+    public Integer getServerAvgResponseTime(){
+         try {
+            this.managementResource = this.restClient.resource(getRestMonitoringURI() + "web/request/");
+            JSONObject result = getMonitoringJSONObject("processingtime");
+            Integer value = result.getInt("count");
+            return value != null ? value : 0;
+        } catch (JSONException ex) {
+            throw new CouldNotRetrieveDataException("Could not retrieve serverAvgRequestTime:" + ex.getMessage());
+        }
+    } 
+    
+     /**
+     * URI: /monitoring/domain/server/web/request/maxtime
+     *
+     * @return
+     */
+    @Override
+    public Integer getServerMaxResponseTime(){
+         try {
+            this.managementResource = this.restClient.resource(getRestMonitoringURI() + "web/request/");
+            JSONObject result = getMonitoringJSONObject("maxtime");
+            Integer value = result.getInt("count");
+            return value != null ? value : 0;
+        } catch (JSONException ex) {
+            throw new CouldNotRetrieveDataException("Could not retrieve serverMaxRequestTime:" + ex.getMessage());
+        }
+    } 
+    
+    @Override
+    public void getServerApplications(){
+        try {
+            this.managementResource = this.restClient.resource(getRestMonitoringURI());
+            JSONObject appEntries = getJSONObject("applications/").getJSONObject("extraProperties").getJSONObject("childResources");
+            Iterator<String> i = appEntries.keys();
+             for ( Iterator<String> entries =  appEntries.keys(); entries.hasNext(); ) {
+                 try{
+                     getJSONObject("applications/"+entries.next()+"/server");
+                 }catch(Exception ex){
+                     //do nothing, only get applications with 'server' related info
+                 }
+                 
+             }
+        } catch (JSONException ex) {
+            java.util.logging.Logger.getLogger(GlassfishRetriever.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

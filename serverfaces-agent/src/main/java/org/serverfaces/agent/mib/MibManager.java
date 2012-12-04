@@ -23,7 +23,6 @@ package org.serverfaces.agent.mib;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -35,9 +34,9 @@ import org.apache.log4j.Logger;
 import org.serverfaces.agent.event.InitMibEvent;
 import org.serverfaces.agent.event.UnregisterMOsEvent;
 import org.serverfaces.agent.event.UpdateMibEvent;
+import org.serverfaces.agent.mo.MOScalarFactory;
 import org.serverfaces.agent.qualifier.Oid;
 import org.serverfaces.agent.server.ServerRetriever;
-import org.serverfaces.agent.util.MOCreator;
 import org.serverfaces.common.qualifier.Log;
 import org.snmp4j.agent.DefaultMOServer;
 import org.snmp4j.agent.DuplicateRegistrationException;
@@ -93,9 +92,15 @@ public class MibManager implements Serializable, MOGroup {
     @Inject
     Instance<OID> serverAddress;
     @Inject
+    Instance<OID> serverErrors;
+    @Inject
+    Instance<OID> serverMaxResponseTime;
+    @Inject
+    Instance<OID> serverAvgResponseTime;
+    @Inject
     Instance<OID> serverLog;
-    
-    @Inject Event<UnregisterMOsEvent> unregisterMOsEvent;
+    @Inject
+    Instance<OID> serverApplications;
     
     /**
      * A server retriever is the guy who retrieves information from a server,
@@ -138,33 +143,41 @@ public class MibManager implements Serializable, MOGroup {
     private void initMOs() {
         log.debug("Registering Mib objects...");
          try {
+             //serverRetriever.getServerApplications();
             // register MOs
-            addInstance(MOCreator.createReadWrite(serverName.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverName.get(),
                     serverRetriever.getServerName()));
-            addInstance(MOCreator.createReadWrite(serverAddress.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverAddress.get(),
                     serverRetriever.getServerAddress()));
-            addInstance(MOCreator.createReadWrite(serverUptime.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverUptime.get(),
                     serverRetriever.getServerUpTime()));
-            addInstance(MOCreator.createReadWrite(serverActiveSessions.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverActiveSessions.get(),
                     serverRetriever.getServerActiveSessions()));
-            addInstance(MOCreator.createReadWrite(serverUsedMemory.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverUsedMemory.get(),
                     serverRetriever.getServerUsedMemory()));
-            addInstance(MOCreator.createReadWrite(serverAvailableMemory.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverAvailableMemory.get(),
                     serverRetriever.getServerAvailableMemory()));
-            addInstance(MOCreator.createReadWrite(serverCpuTime.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverCpuTime.get(),
                     serverRetriever.getServerCpuTime()));
-            addInstance(MOCreator.createReadWrite(serverActiveTransactions.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverActiveTransactions.get(),
                     serverRetriever.getServerActiveTransactions()));
-            addInstance(MOCreator.createReadWrite(serverCommitedTransactions.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverCommitedTransactions.get(),
                     serverRetriever.getServerCommitedTransactions()));
-            addInstance(MOCreator.createReadWrite(serverRollbackTransactions.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverRollbackTransactions.get(),
                     serverRetriever.getServerRollbackTransactions()));
-            addInstance(MOCreator.createReadWrite(serverActiveThreads.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverActiveThreads.get(),
                     serverRetriever.getServerActiveThreads()));
-            addInstance(MOCreator.createReadWrite(serverTotalRequests.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverTotalRequests.get(),
                     serverRetriever.getServerTotalRequests()));
-            addInstance(MOCreator.createReadWrite(serverLog.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverLog.get(),
                     serverRetriever.getServerLog()));
+            addInstance(MOScalarFactory.createReadWrite(serverErrors.get(),
+                    serverRetriever.getServerErrors()));
+            addInstance(MOScalarFactory.createReadWrite(serverMaxResponseTime.get(),
+                    serverRetriever.getServerMaxResponseTime()));
+            addInstance(MOScalarFactory.createReadWrite(serverAvgResponseTime.get(),
+                    serverRetriever.getServerAvgResponseTime()));
+            
             this.registerMOs();
         } catch (DuplicateRegistrationException ex) {
             log.debug("trying to register duplicate object");
@@ -172,6 +185,9 @@ public class MibManager implements Serializable, MOGroup {
                   ex.printStackTrace();
             }
         }
+         catch(Exception ex){
+             ex.printStackTrace();
+         }
         log.debug("MIB objects registered successfully");
     }
     
@@ -224,11 +240,6 @@ public class MibManager implements Serializable, MOGroup {
         this.context = context;
     }
 
-    @PreDestroy
-    public void terminateMIB() {
-        unregisterMOsEvent.fire(new UnregisterMOsEvent(this));
-    }
-
     public void updateMIB(@Observes UpdateMibEvent updateMib) {
         this.updateMIB();
     }
@@ -249,6 +260,9 @@ public class MibManager implements Serializable, MOGroup {
         this.setScalar(getServerRollbackTransactions(), new Gauge32(serverRetriever.getServerRollbackTransactions()));
         this.setScalar(getServerActiveThreads(), new Gauge32(serverRetriever.getServerActiveThreads()));
         this.setScalar(getServerTotalRequests(), new Counter64(serverRetriever.getServerTotalRequests()));
+        this.setScalar(getServerErrors(), new Counter64(serverRetriever.getServerErrors()));
+        this.setScalar(getServerMaxResponseTime(), new Gauge32(serverRetriever.getServerMaxResponseTime()));
+        this.setScalar(getServerAvgResponseTime(), new Gauge32(serverRetriever.getServerAvgResponseTime()));
 //        this.setScalar(serverLog.get(), new OctetString(serverRetriever.getServerLog()));
     }
 
@@ -330,6 +344,22 @@ public class MibManager implements Serializable, MOGroup {
     public OID getServerLog() {
         return serverLog.get();
     }
+    
+    public OID getServerErrors() {
+        return serverErrors.get();
+    }
+    
+    public OID getServerMaxResponseTime() {
+        return serverMaxResponseTime.get();
+    }
+    
+    public OID getServerAvgResponseTime() {
+        return serverAvgResponseTime.get();
+    }
 
+    @Produces
+    public MOGroup produceDefaultMoGroup(){
+        return this;
+    }
    
 }

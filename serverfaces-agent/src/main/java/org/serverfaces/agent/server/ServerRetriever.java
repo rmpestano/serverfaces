@@ -100,9 +100,29 @@ public interface ServerRetriever {
      */
     Long getServerTotalRequests();
     
-    /**
-     *
-     * @return cumulative number of requests processed so far
-     */
+   
     String getServerLog();
+    
+    /**
+     * 
+     * @return Cumulative value of the error count with error count representing 
+     * the number of cases where the response code was greater than or equal to 400
+     */
+    Long getServerErrors();
+    
+    /**
+     * 
+     * @return Longest response time(millisecond) for a request not a cumulative value but 
+     * the largest response time from among the response times
+     */
+    Integer getServerMaxResponseTime();
+    
+    /**
+     * 
+     * @return Average response time(millisecond)
+     */
+    Integer getServerAvgResponseTime();
+    
+    
+    void getServerApplications();
 }

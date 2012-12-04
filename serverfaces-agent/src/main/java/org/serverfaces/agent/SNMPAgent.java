@@ -24,12 +24,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.event.Reception;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.log4j.Logger;
+import org.serverfaces.agent.event.InitMibEvent;
+import org.serverfaces.agent.event.StartAgentEvent;
+import org.serverfaces.agent.event.StopAgentEvent;
 import org.serverfaces.agent.event.UnregisterMOsEvent;
+import org.serverfaces.agent.mib.MibManager;
 import org.serverfaces.common.qualifier.Log;
 
 import org.snmp4j.TransportMapping;
@@ -68,6 +75,10 @@ public class SNMPAgent extends BaseAgent implements Serializable {
     @Inject
     private String agentAddress;
     @Inject @Log Logger log;
+    @Inject
+    Event<InitMibEvent> initMib;
+    @Inject
+    Instance<MOGroup> defaultMoGroup;
     
     
 
@@ -146,7 +157,7 @@ public class SNMPAgent extends BaseAgent implements Serializable {
      */
     @Override
     protected void unregisterManagedObjects() {
-         
+        //this.unregisterManagedObject(defaultMoGroup.get());
     }
 
     /**
@@ -192,9 +203,20 @@ public class SNMPAgent extends BaseAgent implements Serializable {
         finishInit();
         run();
         sendColdStartNotification();
-//        this.unregisterManagedObject(this.getSnmpv2MIB());
         this.setDefaultContext(new OctetString("public"));
     }
+    
+    public void starAgentEvent(@Observes StartAgentEvent startAgentEvent) throws IOException{
+        this.start();
+        initMib.fire(new InitMibEvent(this.getServer(), this.getDefaultContext()));
+        
+    }
+    
+//    public void stopAgentEvent(@Observes(notifyObserver= Reception.IF_EXISTS) StopAgentEvent stopAgentEvent){
+//        if (this.getSession() != null) {
+//            this.stop();
+//        }
+//    }
 
     @Override
     protected void registerSnmpMIBs() {
@@ -217,12 +239,6 @@ public class SNMPAgent extends BaseAgent implements Serializable {
         moGroup.unregisterMOs(server, getContext(moGroup));
     }
     
-    public void unregisterManagedObject(@Observes UnregisterMOsEvent unregisterMOsEvent) {
-        MOGroup moGroup = unregisterMOsEvent.getMoGroup();
-        moGroup.unregisterMOs(server, getContext(moGroup));
-    }
-
-
     public String getAgentAddress() {
         return agentAddress;
     }
@@ -250,7 +266,8 @@ public class SNMPAgent extends BaseAgent implements Serializable {
         this.agentAddress = agentAddress;
     }
     
-    public boolean isRunning(){
+    @Produces
+    public Boolean isRunning(){
         return (this.getAgentState() == SNMPAgent.STATE_RUNNING);
     }
     

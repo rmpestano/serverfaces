@@ -79,5 +79,25 @@ public class TomEERetriever implements ServerRetriever {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public void getServerApplications() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Long getServerErrors() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Integer getServerMaxResponseTime() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Integer getServerAvgResponseTime() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     
 }

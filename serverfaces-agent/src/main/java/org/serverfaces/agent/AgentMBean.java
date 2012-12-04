@@ -78,7 +78,6 @@ public class AgentMBean implements Serializable {
     
     public String startStop() throws IOException{
         if(isAgentRunning()){
-            mibManager.terminateMIB();
             agent.stop();
         }
         else{
@@ -86,7 +85,6 @@ public class AgentMBean implements Serializable {
             try{
                 mibManager.initMIB(agent.getServer(),agent.getDefaultContext());
             }catch(CouldNotRetrieveDataException ex){
-                mibManager.terminateMIB();
                 agent.stop();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Could not start agent",ex.getMessage()));
             }

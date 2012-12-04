@@ -79,7 +79,15 @@ public class TestAgent {
     @Inject
     Instance<OID> serverTotalRequests;//same as -> new OID(".1.3.6.1.2.1.1.11.0")
     @Inject
-    Instance<OID> serverLog;    //same as -> new OID(".1.3.6.1.2.1.1.12.0")
+    Instance<OID> serverErrors;    //same as -> new OID(".1.3.6.1.2.1.1.12.0")
+    @Inject
+    Instance<OID> serverMaxResponseTime;    //same as -> new OID(".1.3.6.1.2.1.1.13.0")
+    @Inject
+    Instance<OID> serverAvgResponseTime;    //same as -> new OID(".1.3.6.1.2.1.1.14.0")
+    @Inject
+    Instance<OID> serverLog;    //same as -> new OID(".1.3.6.1.2.1.1.16.0")
+    @Inject
+    Instance<OID> serverApplications;    //same as -> new OID(".1.3.6.1.2.1.1.17")
 
     @Deployment
     public static Archive<?> createTestArchive() {
@@ -182,7 +190,33 @@ public class TestAgent {
     public void getServerLogResultNotNullAndExistingObject() throws IOException {
         String serverLogValue = snmpManager.getAsString(this.serverLog.get());
         this.validateSNMPGet(serverLogValue);
-        log.info("Server Log: "+serverLogValue);
+        log.info("Server log: "+serverLogValue);
+    }
+    
+    @Test
+    public void getServerErrorsResultNotNullAndExistingObject() throws IOException {
+        String serverErrorsValue = snmpManager.getAsString(this.serverErrors.get());
+        this.validateSNMPGet(serverErrorsValue);
+        log.info("Server errors: "+serverErrorsValue);
+    }
+    
+    @Test
+    public void getServerMaxResponseResultNotNullAndExistingObject() throws IOException {
+        String serverMaxResponseValue = snmpManager.getAsString(this.serverMaxResponseTime.get());
+        this.validateSNMPGet(serverMaxResponseValue);
+        log.info("Server max response: "+serverMaxResponseValue);
+    }
+    
+    @Test
+    public void getServerAvgResponseResultNotNullAndExistingObject() throws IOException {
+        String serverAvgResponseValue = snmpManager.getAsString(this.serverAvgResponseTime.get());
+        this.validateSNMPGet(serverAvgResponseValue);
+        log.info("Server average response: "+serverAvgResponseValue);
+    }
+    
+    @Test
+    public void getServerApplicationsResultNotNullAndExistingObject() throws IOException {
+         
     }
 
     /**

@@ -32,7 +32,6 @@ import org.snmp4j.smi.OID;
 @SessionScoped
 public class ManagerMBean implements Serializable{
     
-    private final int NUM_ALLOWED_SERVERS = 10;
     private String agentAddress;
     private Server server;
     

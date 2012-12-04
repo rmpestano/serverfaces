@@ -5,16 +5,17 @@
 package org.serverfaces.agent.event;
 
 import java.io.Serializable;
-import org.snmp4j.agent.MOGroup;
+import org.snmp4j.agent.DefaultMOServer;
+import org.snmp4j.smi.OctetString;
 
 /**
  *
  * @author Rafael M. Pestano - Nov 26, 2012 10:33:51 AM
  */
-public class UnregisterMOsEvent implements Serializable {
+public class ClearMibEvent implements Serializable {
 
 
-    public UnregisterMOsEvent() {
+    public ClearMibEvent() {
     }
 
 }

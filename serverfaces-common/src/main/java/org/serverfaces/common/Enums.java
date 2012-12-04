@@ -74,7 +74,11 @@ public enum Enums {
         SERVER_ROLLBACK_TRANSACTIONS("server.rollbackTransactions"),
         SERVER_ACTIVE_THREADS("server.activeThreads"),
         SERVER_TOTAL_REQUESTS("server.totalRequests"),
-        SERVER_LOG("server.log");
+        SERVER_LOG("server.log"),
+        SERVER_ERRORS("server.errors"),
+        SERVER_MAX_RESPONSE("server.maxResponseTime"),
+        SERVER_AVG_RESPONSE("server.avgResponseTime"),
+        SERVER_APPLICATIONS("server.applications");
         
         
         public final String value;
