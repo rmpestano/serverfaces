@@ -30,18 +30,14 @@ import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.enterprise.event.Event;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.serverfaces.agent.SNMPAgent;
 import org.serverfaces.agent.event.InitMibEvent;
-import org.serverfaces.agent.event.StartAgentEvent;
-import org.serverfaces.agent.event.StopAgentEvent;
 import org.serverfaces.agent.event.UpdateMibEvent;
 import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.util.Constants;
 import org.serverfaces.common.qualifier.Log;
-import org.snmp4j.smi.OctetString;
 
 /**
  *
@@ -57,28 +53,22 @@ public class Monitor {
     @Log
     Logger log;
     @Inject
-    private Event<StartAgentEvent> startAgent;
-    @Inject
-    private Event<StopAgentEvent> stopAgent;
+    SNMPAgent agent;
     @Inject
     Event<UpdateMibEvent> updateMib;
-    
     @Inject
-    Instance<Boolean> agentRunning;
-
+    Event<InitMibEvent> initMib;
+    
     @PostConstruct
     public void startup() {
         try {
             log.debug("SNMP agent is starting...");
-            //TODO fire CDI event to starup agent
-            startAgent.fire(new StartAgentEvent());
-            
-            // Since BaseAgent registers some MIBs by default we need to unregister
-            // one before we register our own sysDescr.
+            agent.start();
+            initMib.fire(new InitMibEvent(agent.getServer(),agent.getDefaultContext()));
             log.debug("SNMP agent started successfully.");
         } catch (CouldNotRetrieveDataException retrieveEX) {
             log.error("Agent is going to be stopped due to the following error:" + retrieveEX.getMessage() + ".\nYou can try to resolve the problem and start agent later via web interface");
-            stopAgent.fire(new StopAgentEvent());
+            this.terminate();
         } catch (Exception ex) {
             log.error("Could not start SNMP Agent due to the following error:" + ex.getMessage());
             this.terminate();
@@ -92,14 +82,13 @@ public class Monitor {
     @PreDestroy
     public void terminate() {
         log.debug("Stopping SNMP agent...");
-        //TODO fire CDI event to stop agent
-         stopAgent.fire(new StopAgentEvent());
+        agent.stop();
         log.debug("SNMP Agent stopped successfully.");
     }
 
     @Schedule(hour = "*", minute = "*", second = Constants.MONITORING_INTERVAL)
     public void doMonitoring() {
-        if (!agentRunning.get()) {
+        if (!agent.isRunning()) {
             log.debug("Nothing to monitor, Agent is not started.");
             return;
         }

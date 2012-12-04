@@ -88,6 +88,9 @@ public class TestAgent {
     Instance<OID> serverLog;    //same as -> new OID(".1.3.6.1.2.1.1.16.0")
     @Inject
     Instance<OID> serverApplications;    //same as -> new OID(".1.3.6.1.2.1.1.17")
+    
+    @Inject 
+    Instance<Boolean> agentIsRunning;
 
     @Deployment
     public static Archive<?> createTestArchive() {
@@ -216,7 +219,7 @@ public class TestAgent {
     
     @Test
     public void getServerApplicationsResultNotNullAndExistingObject() throws IOException {
-         
+         Assert.fail();
     }
 
     /**
@@ -227,6 +230,11 @@ public class TestAgent {
      */
     private void validateSNMPGet(Object getResult) {
         /**
+         * agent must be running to tests pass
+         */
+        Assert.assertTrue(agentIsRunning.get());
+        
+        /**
          * result null usually occours when manager couldn't reach agent
          */
         Assert.assertNotNull(getResult);
@@ -235,6 +243,7 @@ public class TestAgent {
          * doesnt exist in the mib(its not managed by the agent)
          */
         Assert.assertNotSame(NO_SUCH_OBJECT, getResult);
+        
 
     }
 }

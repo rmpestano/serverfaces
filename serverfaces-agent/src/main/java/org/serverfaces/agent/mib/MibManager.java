@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.serverfaces.agent.event.InitMibEvent;
 import org.serverfaces.agent.event.UnregisterMOsEvent;
 import org.serverfaces.agent.event.UpdateMibEvent;
+import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.mo.MOScalarFactory;
 import org.serverfaces.agent.qualifier.Oid;
 import org.serverfaces.agent.server.ServerRetriever;
@@ -180,14 +181,17 @@ public class MibManager implements Serializable, MOGroup {
             
             this.registerMOs();
         } catch (DuplicateRegistrationException ex) {
-            log.debug("trying to register duplicate object");
+            log.debug("Could not register MIB object due to the following error:"+ex.getMessage());
             if(log.isDebugEnabled()){
                   ex.printStackTrace();
             }
+        } catch (CouldNotRetrieveDataException cne){
+             log.debug("Could not register MIB object due to the following error:"+cne.getMessage());
+             if(log.isDebugEnabled()){
+                  cne.printStackTrace();
+            }
+                throw cne;
         }
-         catch(Exception ex){
-             ex.printStackTrace();
-         }
         log.debug("MIB objects registered successfully");
     }
     
@@ -355,11 +359,6 @@ public class MibManager implements Serializable, MOGroup {
     
     public OID getServerAvgResponseTime() {
         return serverAvgResponseTime.get();
-    }
-
-    @Produces
-    public MOGroup produceDefaultMoGroup(){
-        return this;
     }
    
 }
