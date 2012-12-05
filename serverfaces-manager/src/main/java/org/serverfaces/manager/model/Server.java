@@ -112,11 +112,10 @@ public class Server implements Serializable {
 
     /**
      * 
-     * @return CPU time in MHz
-     * remember that CPUtime comes in miliseconds
+     * @return CPU time in ms
      */
     public Integer getCpuTime() {
-        return cpuTime/100;
+        return cpuTime;
     }
 
     public void setCpuTime(Integer cpuTime) {
