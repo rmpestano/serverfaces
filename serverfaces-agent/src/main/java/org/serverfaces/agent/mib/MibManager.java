@@ -93,7 +93,7 @@ public class MibManager implements Serializable, MOGroup {
     @Inject
     Instance<OID> serverAddress;
     @Inject
-    Instance<OID> serverErrors;
+    Instance<OID> serverTotalErrors;
     @Inject
     Instance<OID> serverMaxResponseTime;
     @Inject
@@ -112,6 +112,7 @@ public class MibManager implements Serializable, MOGroup {
     @Inject
     ServerRetriever serverRetriever;
 
+    
   
 
     /**
@@ -172,8 +173,8 @@ public class MibManager implements Serializable, MOGroup {
                     serverRetriever.getServerTotalRequests()));
             addInstance(MOScalarFactory.createReadWrite(serverLog.get(),
                     serverRetriever.getServerLog()));
-            addInstance(MOScalarFactory.createReadWrite(serverErrors.get(),
-                    serverRetriever.getServerErrors()));
+            addInstance(MOScalarFactory.createReadWrite(serverTotalErrors.get(),
+                    serverRetriever.getServerTotalErrors()));
             addInstance(MOScalarFactory.createReadWrite(serverMaxResponseTime.get(),
                     serverRetriever.getServerMaxResponseTime()));
             addInstance(MOScalarFactory.createReadWrite(serverAvgResponseTime.get(),
@@ -190,7 +191,7 @@ public class MibManager implements Serializable, MOGroup {
              if(log.isDebugEnabled()){
                   cne.printStackTrace();
             }
-                throw cne;
+            throw cne;
         }
         log.debug("MIB objects registered successfully");
     }
@@ -264,7 +265,7 @@ public class MibManager implements Serializable, MOGroup {
         this.setScalar(getServerRollbackTransactions(), new Gauge32(serverRetriever.getServerRollbackTransactions()));
         this.setScalar(getServerActiveThreads(), new Gauge32(serverRetriever.getServerActiveThreads()));
         this.setScalar(getServerTotalRequests(), new Counter64(serverRetriever.getServerTotalRequests()));
-        this.setScalar(getServerErrors(), new Counter64(serverRetriever.getServerErrors()));
+        this.setScalar(getServerTotalErrors(), new Counter64(serverRetriever.getServerTotalErrors()));
         this.setScalar(getServerMaxResponseTime(), new Gauge32(serverRetriever.getServerMaxResponseTime()));
         this.setScalar(getServerAvgResponseTime(), new Gauge32(serverRetriever.getServerAvgResponseTime()));
 //        this.setScalar(serverLog.get(), new OctetString(serverRetriever.getServerLog()));
@@ -349,8 +350,8 @@ public class MibManager implements Serializable, MOGroup {
         return serverLog.get();
     }
     
-    public OID getServerErrors() {
-        return serverErrors.get();
+    public OID getServerTotalErrors() {
+        return serverTotalErrors.get();
     }
     
     public OID getServerMaxResponseTime() {

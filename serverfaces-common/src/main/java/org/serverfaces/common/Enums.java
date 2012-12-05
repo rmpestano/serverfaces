@@ -75,7 +75,7 @@ public enum Enums {
         SERVER_ACTIVE_THREADS("server.activeThreads"),
         SERVER_TOTAL_REQUESTS("server.totalRequests"),
         SERVER_LOG("server.log"),
-        SERVER_ERRORS("server.errors"),
+        SERVER_TOTAL_ERRORS("server.totalErrors"),
         SERVER_MAX_RESPONSE("server.maxResponseTime"),
         SERVER_AVG_RESPONSE("server.avgResponseTime"),
         SERVER_APPLICATIONS("server.applications");

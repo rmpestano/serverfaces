@@ -256,7 +256,7 @@ public class GlassfishRetriever implements ServerRetriever {
      * @return
      */
     @Override
-    public Long getServerErrors(){
+    public Long getServerTotalErrors(){
          try {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "web/request/");
             JSONObject result = getMonitoringJSONObject("errorcount");

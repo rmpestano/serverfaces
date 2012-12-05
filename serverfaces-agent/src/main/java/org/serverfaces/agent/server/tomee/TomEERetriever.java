@@ -85,7 +85,7 @@ public class TomEERetriever implements ServerRetriever {
     }
 
     @Override
-    public Long getServerErrors() {
+    public Long getServerTotalErrors() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

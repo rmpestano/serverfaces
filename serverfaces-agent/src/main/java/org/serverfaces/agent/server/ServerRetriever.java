@@ -108,7 +108,7 @@ public interface ServerRetriever {
      * @return Cumulative value of the error count with error count representing 
      * the number of cases where the response code was greater than or equal to 400
      */
-    Long getServerErrors();
+    Long getServerTotalErrors();
     
     /**
      * 

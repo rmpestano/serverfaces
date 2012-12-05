@@ -17,8 +17,13 @@ public class Application implements Serializable {
 
     @Id
     private long id;
-    @Embedded
-    private MonitorableResource info;
+    private String name;
+    private Integer activeSessions;
+    private Long totalRequests;
+    private Long totalErrors;
+    private Integer maxResponseTime;
+    private Integer avgResponseTime;
+   
     @ManyToOne
     private Server server;
 
@@ -30,13 +35,54 @@ public class Application implements Serializable {
         this.id = id;
     }
 
-    public MonitorableResource getInfo() {
-        return info;
+    public String getName() {
+        return name;
     }
 
-    public void setInfo(MonitorableResource appInfo) {
-        this.info = appInfo;
+    public void setName(String name) {
+        this.name = name;
     }
+
+    public Integer getActiveSessions() {
+        return activeSessions;
+    }
+
+    public void setActiveSessions(Integer activeSessions) {
+        this.activeSessions = activeSessions;
+    }
+
+    public Long getTotalRequests() {
+        return totalRequests;
+    }
+
+    public void setTotalRequests(Long totalRequests) {
+        this.totalRequests = totalRequests;
+    }
+
+    public Long getTotalErrors() {
+        return totalErrors;
+    }
+
+    public void setTotalErrors(Long totalErrors) {
+        this.totalErrors = totalErrors;
+    }
+
+    public Integer getMaxResponseTime() {
+        return maxResponseTime;
+    }
+
+    public void setMaxResponseTime(Integer maxResponseTime) {
+        this.maxResponseTime = maxResponseTime;
+    }
+
+    public Integer getAvgResponseTime() {
+        return avgResponseTime;
+    }
+
+    public void setAvgResponseTime(Integer avgResponseTime) {
+        this.avgResponseTime = avgResponseTime;
+    }
+
 
     public Server getServer() {
         return server;

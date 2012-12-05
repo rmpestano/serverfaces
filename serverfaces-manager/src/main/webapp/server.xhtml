@@ -19,7 +19,7 @@
         <p:outputPanel layout="block" id="monitoringPanel">
             <p:poll async="true" partialSubmit="true" process="monitoringPanel" listener="#{managerMBean.doMonitoring}" rendered="#{not empty managerMBean.servers}" update="mainForm:monitoringPanel"/>
             <p:dataGrid rendered="#{not empty managerMBean.servers}" columns="2" value="#{managerMBean.servers}" var="s">   
-                <p:panel  header="#{s.info.name}" style="width: 370px;overflow: auto;font-size: 11px;overflow-x: hidden" styleClass="monitoringPanel ui-panel-title" >
+                <p:panel  header="#{s.name}" style="width: 370px;overflow: auto;font-size: 11px;overflow-x: hidden" styleClass="monitoringPanel ui-panel-title" >
                     <f:facet name="actions">  
                         <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{managerMBean.doServerMoniring(s)}" oncomplete="alert('call')" update="@form">  
                             <h:outputText styleClass="ui-icon ui-icon-help" />  
@@ -29,23 +29,39 @@
                         <h:outputLabel for="agent" value="Agent:" style="font-weight: bold"/>
                         <h:outputText id="agent" value="#{s.agentAddress}"/>
                         <h:outputLabel for="uptime" value="Uptime:" style="font-weight: bold"/>
-                        <h:outputText id="uptime" value="#{s.info.uptime}"/>
+                        <h:outputText id="uptime" value="#{s.uptime}"/>
                         <h:outputLabel for="sessions" value=" Active Sessions:" style="font-weight: bold"/>
-                        <h:outputText id="sessions" value="#{s.info.activeSessions}"/>
+                        <h:outputText id="sessions" value="#{s.activeSessions}"/>
                         <h:outputLabel for="usedMemory" value="Used Memory:" style="font-weight: bold"/>
-                        <h:outputText id="usedMemory" value="#{s.info.usedMemory}"/>
+                        <h:panelGroup>
+                            <h:outputText id="usedMemory" value="#{s.usedMemory}">
+                                <f:convertNumber maxFractionDigits="3" locale="pt_BR"/>  
+                            </h:outputText>&#160;MB
+                        </h:panelGroup>
                         <h:outputLabel for="availableMemory" value="Available Memory:" style="font-weight: bold"/>
-                        <h:outputText id="availableMemory" value="#{s.info.availableMemory}"/>
-                        <h:outputLabel for="cpuTime" value="Cpu Time(khz):" style="font-weight: bold"/>
-                        <h:outputText id="cpuTime" value="#{s.info.cpuTime}"/>
+                        <h:panelGroup>
+                            <h:outputText id="availableMemory" value="#{s.availableMemory}">
+                                <f:convertNumber maxFractionDigits="3" locale="pt_BR"/>  
+                            </h:outputText>&#160;MB
+                        </h:panelGroup>
+                        <h:outputLabel for="cpuTime" value="Cpu Time:" style="font-weight: bold"/>
+                        <h:outputText id="cpuTime" value="#{s.cpuTime} MHz"/>
                         <h:outputLabel for="activeTransactions" value="Active Transactions:" style="font-weight: bold"/>
-                        <h:outputText id="activeTransactions" value="#{s.info.activeTransactions}"/>
+                        <h:outputText id="activeTransactions" value="#{s.activeTransactions}"/>
                         <h:outputLabel for="commitedTransactions" value="Commited Transactions:" style="font-weight: bold"/>
-                        <h:outputText id="commitedTransactions" value="#{s.info.commitedTransactions}"/>
+                        <h:outputText id="commitedTransactions" value="#{s.commitedTransactions}"/>
                         <h:outputLabel for="rollbackTransactions" value="Rollback Transactions:" style="font-weight: bold"/>
-                        <h:outputText id="rollbackTransactions" value="#{s.info.rollbackTransactions}"/>
+                        <h:outputText id="rollbackTransactions" value="#{s.rollbackTransactions}"/>
                         <h:outputLabel for="activeThreads" value="Active Threads:" style="font-weight: bold"/>
-                        <h:outputText id="activeThreads" value="#{s.info.activeThreads}"/>
+                        <h:outputText id="activeThreads" value="#{s.activeThreads}"/>
+                        <h:outputLabel for="maxResponse" value="Max Response Time:" style="font-weight: bold"/>
+                        <h:outputText id="maxResponse" value="#{s.maxResponseTime} ms"/>
+                        <h:outputLabel for="avgResponse" value="Average Response Time:" style="font-weight: bold"/>
+                        <h:outputText id="avgResponse" value="#{s.avgResponseTime} ms"/>
+                        <h:outputLabel for="totalRequests" value="Total Requests:" style="font-weight: bold"/>
+                        <h:outputText id="totalRequests" value="#{s.totalRequests}"/>
+                        <h:outputLabel for="totalErrors" value="Total Errors:" style="font-weight: bold"/>
+                        <h:outputText id="totalErrors" value="#{s.totalErrors}"/>
                     </h:panelGrid>
                     <center>
                         <p:commandButton value="View Applications" action="#{managerMBean.doApplicationMonitoring(s)}" update=":appDialog" oncomplete="appDialogWdg.show()"/>
@@ -64,14 +80,14 @@
     </ui:define>
 
     <ui:define name="popup">
-        <p:dialog id="appDialog" widgetVar="appDialogWdg" width="600" header="Applications of #{managerMBean.server.info.name}" showEffect="clip" hideEffect="fade">
+        <p:dialog id="appDialog" widgetVar="appDialogWdg" width="600" header="Applications of #{managerMBean.server.name}" showEffect="clip" hideEffect="fade">
             <h:form id="appDialogForm">
                 <p:dataTable rendered="#{not empty managerMBean.server.applications}" value="#{managerMBean.server.applications}" var="a">
                     <f:facet name="header">
                         Deployed Applications 
                     </f:facet>
                     <p:column  headerText="Name">
-                        #{a.info.name}
+                        #{a.name}
                     </p:column>
                 </p:dataTable>
             </h:form>

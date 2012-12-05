@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.serverfaces.common.qualifier.Log;
 import org.serverfaces.manager.SNMPManager;
 import org.serverfaces.manager.model.Application;
-import org.serverfaces.manager.model.MonitorableResource;
 import org.serverfaces.manager.model.Server;
 import org.serverfaces.manager.util.MessagesController;
 import org.snmp4j.smi.OID;
@@ -60,6 +59,14 @@ public class ManagerMBean implements Serializable{
     Instance<OID> serverActiveThreads;
     @Inject
     Instance<OID> serverTotalRequests;
+    @Inject
+    Instance<OID> serverTotalErrors;
+    @Inject
+    Instance<OID> serverMaxResponseTime;
+    @Inject
+    Instance<OID> serverAvgResponseTime;
+    @Inject
+    Instance<OID> serverLog;
    
     
     @Inject
@@ -78,6 +85,11 @@ public class ManagerMBean implements Serializable{
 
     public void addServer(){
         try {
+             //for local addresses just use '/'+'port' eg: /16612 = localhost/16112
+            if(agentAddress != null && agentAddress.startsWith("/")){
+                agentAddress = "localhost".concat(agentAddress);
+            }
+            
             if(this.serverAlreadyMonitored(agentAddress)){
                 messages.addError("Could not add server because its already being monitored!");
                 return;
@@ -87,6 +99,7 @@ public class ManagerMBean implements Serializable{
                 messages.addError("Could not establish connection with agent:"+agentAddress);
                 return;
             }
+           
             Server s = new Server(agentAddress);
             servers.add(s);
             this.doServerMoniring(s);
@@ -161,27 +174,28 @@ public class ManagerMBean implements Serializable{
     
     public void doServerMoniring(Server server) throws IOException {
           sNMPManager.setAgentAddress(server.getAgentAddress());
-          server.getInfo().setName(sNMPManager.getAsString(serverName.get()));
-          server.getInfo().setActiveSessions(sNMPManager.getAsInt(serverActiveSessions.get()));
-          server.getInfo().setActiveThreads(sNMPManager.getAsInt(serverActiveThreads.get()));
-          server.getInfo().setActiveTransactions(sNMPManager.getAsInt(serverActiveTransactions.get()));
-          server.getInfo().setAvailableMemory(sNMPManager.getAsInt(serverAvailableMemory.get()));
-          server.getInfo().setUsedMemory(sNMPManager.getAsInt(serverUsedMemory.get()));
-          server.getInfo().setCommitedTransactions(sNMPManager.getAsInt(serverCommitedTransactions.get()));
-          server.getInfo().setCpuTime(sNMPManager.getAsInt(serverCpuTime.get()));
-          server.getInfo().setRollbackTransactions(sNMPManager.getAsInt(serverRollbackTransactions.get()));
-          server.getInfo().setTotalRequests(sNMPManager.getAsLong(serverTotalRequests.get()));
-          server.getInfo().setUptime(sNMPManager.getAsString(serverUptime.get()));
+          server.setName(sNMPManager.getAsString(serverName.get()));
+          server.setActiveSessions(sNMPManager.getAsInt(serverActiveSessions.get()));
+          server.setActiveThreads(sNMPManager.getAsInt(serverActiveThreads.get()));
+          server.setActiveTransactions(sNMPManager.getAsInt(serverActiveTransactions.get()));
+          server.setAvailableMemory(sNMPManager.getAsInt(serverAvailableMemory.get()));
+          server.setUsedMemory(sNMPManager.getAsInt(serverUsedMemory.get()));
+          server.setCommitedTransactions(sNMPManager.getAsInt(serverCommitedTransactions.get()));
+          server.setCpuTime(sNMPManager.getAsInt(serverCpuTime.get()));
+          server.setRollbackTransactions(sNMPManager.getAsInt(serverRollbackTransactions.get()));
+          server.setTotalRequests(sNMPManager.getAsLong(serverTotalRequests.get()));
+          server.setTotalErrors(sNMPManager.getAsLong(serverTotalErrors.get()));
+          server.setMaxResponseTime(sNMPManager.getAsInt(serverMaxResponseTime.get()));
+          server.setAvgResponseTime(sNMPManager.getAsInt(serverAvgResponseTime.get()));
+          server.setUptime(sNMPManager.getAsString(serverUptime.get()));
      }
     
     public void doApplicationMonitoring(Server s){
         server = s;
         Application a = new Application();
-        a.setInfo(new MonitorableResource());
-        a.getInfo().setName("App1");
+        a.setName("App1");
         Application a2 = new Application();
-        a2.setInfo(new MonitorableResource());
-        a2.getInfo().setName("App2");
+        a2.setName("App2");
         server.getApplications().add(a2);
         server.getApplications().add(a);
         //TODO get app info via snmp
