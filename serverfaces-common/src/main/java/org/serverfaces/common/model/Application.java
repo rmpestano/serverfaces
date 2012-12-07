@@ -2,10 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.serverfaces.manager.model;
+package org.serverfaces.common.model;
 
 import java.io.Serializable;
-import javax.persistence.Embedded;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
@@ -16,8 +15,7 @@ import javax.persistence.ManyToOne;
 public class Application implements Serializable {
 
     @Id
-    private long id;
-    private String name;
+    private String name;//theorically you cant deploy same application on the same server twice so the name will be our discriminator
     private Integer activeSessions;
     private Long totalRequests;
     private Long totalErrors;
@@ -27,13 +25,6 @@ public class Application implements Serializable {
     @ManyToOne
     private Server server;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -95,7 +86,7 @@ public class Application implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 89 * hash + (int) (this.id ^ (this.id >>> 32));
+        hash = 29 * hash + (this.name != null ? this.name.hashCode() : 0);
         return hash;
     }
 
@@ -108,11 +99,11 @@ public class Application implements Serializable {
             return false;
         }
         final Application other = (Application) obj;
-        if (this.id != other.id) {
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
             return false;
         }
         return true;
     }
-    
+ 
     
 }

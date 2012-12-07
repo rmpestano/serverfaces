@@ -25,7 +25,6 @@ import org.serverfaces.agent.monitoriment.Monitor;
 import org.serverfaces.agent.server.ServerRetriever;
 import org.serverfaces.agent.server.glassfish.GlassfishRetriever;
 import org.serverfaces.agent.server.jboss.JBossASRetriever;
-import org.serverfaces.agent.server.tomcat.TomcatRetriever;
 import org.serverfaces.agent.server.tomee.TomEERetriever;
 import org.serverfaces.agent.server.weblogic.WebLogicRetriever;
 import org.serverfaces.agent.util.SimpleSNMPManager;
@@ -101,7 +100,7 @@ public class TestAgent {
         WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(ServerRetriever.class, Monitor.class, SNMPAgent.class,
                 GlassfishRetriever.class, JBossASRetriever.class, TomEERetriever.class,
-                TomcatRetriever.class, WebLogicRetriever.class, SNMPAgent.class)
+                 WebLogicRetriever.class, SNMPAgent.class)
                 .addPackage("org.serverfaces.agent.util").addPackage("org.serverfaces.agent.mib")
                 .addPackage("org.serverfaces.common").addPackage("org.serverfaces.common.qualifier")
                 .addAsLibraries(resolver.artifact("org.snmp4j:snmp4j-agent:2.0.6").resolveAsFiles())

@@ -5,8 +5,10 @@
 
 package org.serverfaces.agent.server.weblogic;
 
+import java.util.List;
 import javax.enterprise.inject.Alternative;
 import org.serverfaces.agent.server.ServerRetriever;
+import org.serverfaces.common.model.Application;
 
 /**
  *
@@ -81,7 +83,7 @@ public class WebLogicRetriever implements ServerRetriever{
     }
 
     @Override
-    public void getServerApplications() {
+    public List<Application> getServerApplications() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

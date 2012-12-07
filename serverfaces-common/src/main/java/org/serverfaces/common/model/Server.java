@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.serverfaces.manager.model;
+package org.serverfaces.common.model;
 
 import java.io.Serializable;
 import java.util.List;

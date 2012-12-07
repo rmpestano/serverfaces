@@ -24,7 +24,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Instance;
@@ -36,6 +38,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.server.ServerRetriever;
+import org.serverfaces.common.model.Application;
 import org.serverfaces.common.qualifier.Log;
 
 /**
@@ -302,21 +305,32 @@ public class GlassfishRetriever implements ServerRetriever {
     } 
     
     @Override
-    public void getServerApplications(){
+    public List<Application> getServerApplications(){
         try {
+            List<Application> currentApplications = new ArrayList<Application>();
             this.managementResource = this.restClient.resource(getRestMonitoringURI());
             JSONObject appEntries = getJSONObject("applications/").getJSONObject("extraProperties").getJSONObject("childResources");
             Iterator<String> i = appEntries.keys();
              for ( Iterator<String> entries =  appEntries.keys(); entries.hasNext(); ) {
                  try{
-                     getJSONObject("applications/"+entries.next()+"/server");
+                     String name = entries.next();
+                     this.managementResource =  this.restClient.resource(getRestMonitoringURI() +"applications/"+name+"/server/");
+                     Application app = new Application();
+                     app.setName(name);
+                     app.setActiveSessions(getMonitoringJSONObject("activesessionscurrent").getInt("current"));
+                     app.setTotalRequests(getMonitoringJSONObject("requestcount").getLong("count"));
+                     app.setTotalErrors(getMonitoringJSONObject("errorcount").getLong("count"));
+                     app.setMaxResponseTime(getMonitoringJSONObject("maxtime").getInt("count"));
+                     app.setAvgResponseTime(getMonitoringJSONObject("processingtime").getInt("count"));
+                     currentApplications.add(app);
                  }catch(Exception ex){
                      //do nothing, only get applications with 'server' related info
                  }
                  
              }
+             return currentApplications;
         } catch (JSONException ex) {
-            java.util.logging.Logger.getLogger(GlassfishRetriever.class.getName()).log(Level.SEVERE, null, ex);
+             throw new CouldNotRetrieveDataException("Could not retrieve serverApplications:" + ex.getMessage());
         }
     }
 

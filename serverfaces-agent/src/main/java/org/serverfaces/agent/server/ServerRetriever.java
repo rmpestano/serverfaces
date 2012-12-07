@@ -20,6 +20,9 @@
  */
 package org.serverfaces.agent.server;
 
+import java.util.List;
+import org.serverfaces.common.model.Application;
+
 /**
  *
  * @author Rafael M. Pestano
@@ -124,5 +127,5 @@ public interface ServerRetriever {
     Integer getServerAvgResponseTime();
     
     
-    void getServerApplications();
+    List<Application> getServerApplications();
 }

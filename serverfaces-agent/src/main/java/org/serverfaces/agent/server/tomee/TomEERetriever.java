@@ -4,8 +4,10 @@
  */
 package org.serverfaces.agent.server.tomee;
 
+import java.util.List;
 import javax.enterprise.inject.Alternative;
 import org.serverfaces.agent.server.ServerRetriever;
+import org.serverfaces.common.model.Application;
 
 /**
  *
@@ -80,7 +82,7 @@ public class TomEERetriever implements ServerRetriever {
     }
 
     @Override
-    public void getServerApplications() {
+    public List<Application> getServerApplications() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

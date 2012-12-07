@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
@@ -32,23 +31,27 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.serverfaces.agent.event.InitMibEvent;
-import org.serverfaces.agent.event.UnregisterMOsEvent;
 import org.serverfaces.agent.event.UpdateMibEvent;
 import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.mo.MOScalarFactory;
+import org.serverfaces.agent.mo.MOTableBuilder;
 import org.serverfaces.agent.qualifier.Oid;
 import org.serverfaces.agent.server.ServerRetriever;
+import org.serverfaces.common.model.Application;
 import org.serverfaces.common.qualifier.Log;
 import org.snmp4j.agent.DefaultMOServer;
 import org.snmp4j.agent.DuplicateRegistrationException;
 import org.snmp4j.agent.MOGroup;
 import org.snmp4j.agent.MOServer;
 import org.snmp4j.agent.ManagedObject;
+import org.snmp4j.agent.mo.MOAccessImpl;
 import org.snmp4j.agent.mo.MOScalar;
+import org.snmp4j.agent.mo.MOTable;
 import org.snmp4j.smi.Counter64;
 import org.snmp4j.smi.Gauge32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.SMIConstants;
 import org.snmp4j.smi.Variable;
 
 /**
@@ -179,6 +182,7 @@ public class MibManager implements Serializable, MOGroup {
                     serverRetriever.getServerMaxResponseTime()));
             addInstance(MOScalarFactory.createReadWrite(serverAvgResponseTime.get(),
                     serverRetriever.getServerAvgResponseTime()));
+            addInstance(createApplicationTable());
             
             this.registerMOs();
         } catch (DuplicateRegistrationException ex) {
@@ -360,6 +364,33 @@ public class MibManager implements Serializable, MOGroup {
     
     public OID getServerAvgResponseTime() {
         return serverAvgResponseTime.get();
+    }
+    
+    public OID getserverApplications() {
+        return serverApplications.get();
+    }
+
+    private MOTable createApplicationTable() {
+        MOTableBuilder builder = new MOTableBuilder(getserverApplications()).
+                 addColumnType(SMIConstants.SYNTAX_OCTET_STRING,MOAccessImpl.ACCESS_READ_ONLY)
+		.addColumnType(SMIConstants.SYNTAX_GAUGE32,MOAccessImpl.ACCESS_READ_WRITE)
+		.addColumnType(SMIConstants.SYNTAX_COUNTER64,MOAccessImpl.ACCESS_READ_WRITE)
+		.addColumnType(SMIConstants.SYNTAX_COUNTER64,MOAccessImpl.ACCESS_READ_WRITE)
+		.addColumnType(SMIConstants.SYNTAX_GAUGE32,MOAccessImpl.ACCESS_READ_WRITE)
+		.addColumnType(SMIConstants.SYNTAX_GAUGE32,MOAccessImpl.ACCESS_READ_WRITE);
+        
+        for (Application application : serverRetriever.getServerApplications()) {
+             builder.addRowValue(new OctetString(application.getName()));
+             builder.addRowValue(new Gauge32(application.getActiveSessions()));
+             builder.addRowValue(new Counter64(application.getTotalRequests()));
+             builder.addRowValue(new Counter64(application.getTotalErrors()));
+             builder.addRowValue(new Gauge32(application.getMaxResponseTime()));
+             builder.addRowValue(new Gauge32(application.getAvgResponseTime()));
+        }
+        
+       
+        return builder.build();
+        
     }
    
 }
