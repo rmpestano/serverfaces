@@ -19,6 +19,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.serverfaces.agent.SNMPAgent;
@@ -51,8 +52,7 @@ public class TestAgent {
     @Inject
     SNMPManager snmpManager;
     @Inject
-    @Log
-    Logger log;
+    @Log  Logger log;
     //OIDs
     @Inject
     Instance<OID> serverName;//same as -> new OID(".1.3.6.1.2.1.1.1.0")
@@ -88,7 +88,8 @@ public class TestAgent {
     OID serverApplications;    //same as -> new OID(".1.3.6.1.2.1.1.17")
     @Inject
     Instance<Boolean> agentIsRunning;
-
+    
+    @Inject String agentAddress;
     @Deployment
     public static Archive<?> createTestArchive() {
         MavenDependencyResolver resolver = DependencyResolvers
@@ -107,6 +108,11 @@ public class TestAgent {
         // verify that the JAR files ended up in the WAR
 //        System.out.println(war.toString(true));
         return war;
+    }
+    
+    @Before
+    public void init(){
+        snmpManager.setAgentAddress(agentAddress);
     }
 
     @Test

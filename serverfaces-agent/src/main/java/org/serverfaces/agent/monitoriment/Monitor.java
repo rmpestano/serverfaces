@@ -71,7 +71,7 @@ public class Monitor {
             this.terminate();
         } catch (Exception ex) {
             log.error("Could not start SNMP Agent due to the following error:" + ex.getMessage());
-            this.terminate();
+            this.terminate(); 
             ex.printStackTrace();
         }
 

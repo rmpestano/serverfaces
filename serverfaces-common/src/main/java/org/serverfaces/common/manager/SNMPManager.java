@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.serverfaces.common.model.Application;
@@ -40,7 +41,6 @@ import org.snmp4j.util.TableUtils;
 public class SNMPManager implements Serializable {
 
     private Snmp snmp = null;
-    @Inject
     private String agentAddress;
     private TransportMapping transport;
     @Inject
@@ -48,6 +48,7 @@ public class SNMPManager implements Serializable {
 
     public SNMPManager() {
     }
+    
 
     public TransportMapping getTransport() throws IOException {
         if (transport == null) {

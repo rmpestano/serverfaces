@@ -16,9 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.log4j.Logger;
 import org.serverfaces.common.manager.SNMPManager;
-import org.serverfaces.common.qualifier.Log;
-import org.serverfaces.common.model.Application;
 import org.serverfaces.common.model.Server;
+import org.serverfaces.common.qualifier.Log;
 import org.serverfaces.manager.util.MessagesController;
 import org.snmp4j.smi.OID;
 
