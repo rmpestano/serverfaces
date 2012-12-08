@@ -48,7 +48,6 @@ public class SNMPManager implements Serializable {
 
     public SNMPManager() {
     }
-    
 
     public TransportMapping getTransport() throws IOException {
         if (transport == null) {
@@ -160,17 +159,19 @@ public class SNMPManager implements Serializable {
         TableUtils tableUtils = new TableUtils(snmp, new DefaultPDUFactory());
         List<TableEvent> events = tableUtils.getTable(getTarget(), new OID[]{new OID(serverApplications + ".1"), new OID(serverApplications + ".2"), new OID(serverApplications + ".3"), new OID(serverApplications + ".4"), new OID(serverApplications + ".5"), new OID(serverApplications + ".6")}, null, null);
         List<Application> applications = new ArrayList<Application>();
-        for (TableEvent event : events){
-              Application app = new Application();
-              VariableBinding[] varBind = event.getColumns();
-              app.setName(varBind[0].getVariable().toString());
-              app.setActiveSessions(varBind[1].getVariable().toInt());
-              app.setTotalRequests(varBind[2].getVariable().toLong());
-              app.setTotalErrors(varBind[3].getVariable().toLong());
-              app.setMaxResponseTime(varBind[4].getVariable().toInt());
-              app.setAvgResponseTime(varBind[5].getVariable().toInt());
-              applications.add(app);
-           }
+        for (TableEvent event : events) {
+            Application app = new Application();
+            VariableBinding[] varBind = event.getColumns();
+            if (varBind != null) {
+                app.setName(varBind[0].getVariable().toString());
+                app.setActiveSessions(varBind[1].getVariable().toInt());
+                app.setTotalRequests(varBind[2].getVariable().toLong());
+                app.setTotalErrors(varBind[3].getVariable().toLong());
+                app.setMaxResponseTime(varBind[4].getVariable().toInt());
+                app.setAvgResponseTime(varBind[5].getVariable().toInt());
+                applications.add(app);
+            }
+        }
         return applications;
     }
 
@@ -181,5 +182,4 @@ public class SNMPManager implements Serializable {
     public void setAgentAddress(String agentAddress) {
         this.agentAddress = agentAddress;
     }
-    
 }

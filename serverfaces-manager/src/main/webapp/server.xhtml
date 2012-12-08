@@ -17,7 +17,7 @@
         </h:panelGrid>
 
         <p:outputPanel layout="block" id="monitoringPanel">
-            <p:poll async="true" partialSubmit="true" process="monitoringPanel" listener="#{managerMBean.doMonitoring}" rendered="#{not empty managerMBean.servers}" update="mainForm:monitoringPanel"/>
+            <p:poll interval="1" async="true" partialSubmit="true" process="monitoringPanel" listener="#{managerMBean.doMonitoring}" rendered="#{not empty managerMBean.servers}" update="mainForm:monitoringPanel :appDialogForm:appPanel"/>
             <p:dataGrid rendered="#{not empty managerMBean.servers}" columns="2" value="#{managerMBean.servers}" var="s">   
                 <p:panel  header="#{s.name}" style="width: 370px;overflow: auto;font-size: 11px;overflow-x: hidden" styleClass="monitoringPanel ui-panel-title" >
                     <f:facet name="actions">  
@@ -64,7 +64,7 @@
                         <h:outputText id="totalErrors" value="#{s.totalErrors}"/>
                     </h:panelGrid>
                     <center>
-                        <p:commandButton value="View Applications" action="#{managerMBean.doApplicationMonitoring(s)}" update=":appDialog" oncomplete="appDialogWdg.show()"/>
+                        <p:commandButton value="View Applications" action="#{managerMBean.doApplicationMonitoring(s)}" update=":appDialog" oncomplete="appDialogWdg.show()" async="true" partialSubmit="true"/>
                     </center>
                     
                 </p:panel>
@@ -80,16 +80,33 @@
     </ui:define>
 
     <ui:define name="popup">
-        <p:dialog id="appDialog" widgetVar="appDialogWdg" width="600" header="Applications of #{managerMBean.server.name}" showEffect="clip" hideEffect="fade">
+        <p:dialog id="appDialog" widgetVar="appDialogWdg" width="600" header="Applications of #{managerMBean.server.name}" showEffect="clip" hideEffect="fade" >
             <h:form id="appDialogForm">
-                <p:dataTable rendered="#{not empty managerMBean.server.applications}" value="#{managerMBean.server.applications}" var="a">
-                    <f:facet name="header">
-                        Deployed Applications 
-                    </f:facet>
-                    <p:column  headerText="Name">
-                        #{a.name}
-                    </p:column>
-                </p:dataTable>
+                <p:outputPanel id="appPanel">
+                    <p:dataTable rendered="#{not empty managerMBean.server.applications}" value="#{managerMBean.server.applications}" var="a">
+                        <f:facet name="header">
+                            Deployed Applications 
+                        </f:facet>
+                        <p:column  headerText="Name">
+                            #{a.name}
+                        </p:column>
+                        <p:column  headerText="Sessions">
+                            #{a.activeSessions}
+                        </p:column>
+                        <p:column  headerText="Requests">
+                            #{a.totalRequests}
+                        </p:column>
+                        <p:column  headerText="Errors">
+                            #{a.totalErrors}
+                        </p:column>
+                        <p:column  headerText="Max Response">
+                            #{a.maxResponseTime} ms
+                        </p:column>
+                        <p:column  headerText="Average Response">
+                            #{a.avhResponseTime} ms
+                        </p:column>
+                    </p:dataTable>
+               </p:outputPanel>         
             </h:form>
         </p:dialog>
     </ui:define>

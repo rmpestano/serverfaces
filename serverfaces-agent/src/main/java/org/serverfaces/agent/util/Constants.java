@@ -11,6 +11,6 @@ package org.serverfaces.agent.util;
  */
 public interface Constants {
 
-    static final String MONITORING_INTERVAL = "*/5";
+    static final String MONITORING_INTERVAL = "*/3";
     static final int MONITORING_ACCESS_TIMEOUT = 10000;
 }

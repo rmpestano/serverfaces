@@ -192,7 +192,6 @@ public class ManagerMBean implements Serializable{
     
     public void doApplicationMonitoring(Server s) throws IOException{
         server = s;
-        doServerMontoring(server);
     }
     
 }
