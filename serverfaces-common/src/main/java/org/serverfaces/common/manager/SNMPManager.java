@@ -2,12 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.serverfaces.agent.util;
+package org.serverfaces.common.manager;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.serverfaces.common.model.Application;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -22,31 +26,38 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+import org.snmp4j.util.DefaultPDUFactory;
+import org.snmp4j.util.TableEvent;
+import org.snmp4j.util.TableUtils;
 
 /**
  *
  * @author Rafael M. Pestano - Nov 16, 2012 5:12:20 PM
  *
- * A simple snmp manager to test agent
+ * the guy who communicates with agent via SNMP protocol
  */
-public class SimpleSNMPManager {
+@Singleton
+public class SNMPManager implements Serializable {
 
-    Snmp snmp = null;
-    @Inject 
-    Instance<String> agentAddress;
-    
+    private Snmp snmp = null;
+    @Inject
+    private String agentAddress;
     private TransportMapping transport;
+    @Inject
+    OID serverApplications;
 
-    
-    public TransportMapping getTransport() throws IOException{
-        if(transport == null){
-                transport =  new DefaultUdpTransportMapping();
-        }
-       return transport;     
+    public SNMPManager() {
     }
-    
+
+    public TransportMapping getTransport() throws IOException {
+        if (transport == null) {
+            transport = new DefaultUdpTransportMapping();
+        }
+        return transport;
+    }
+
     @PostConstruct
-    public void initManager() throws IOException{
+    public void initManager() throws IOException {
         this.start();
     }
 
@@ -62,8 +73,8 @@ public class SimpleSNMPManager {
         // Do not forget this line!
         getTransport().listen();
     }
-    
-    public void stop() throws IOException{
+
+    public void stop() throws IOException {
         getTransport().close();
         snmp = null;
     }
@@ -79,28 +90,28 @@ public class SimpleSNMPManager {
     public String getAsString(OID oid) throws IOException {
         ResponseEvent event = get(new OID[]{oid});
         PDU pdu = event.getResponse();
-        if(pdu != null){
+        if (pdu != null) {
             return pdu.get(0).getVariable().toString();
         }
         return null;
     }
-    
-     public Long getAsLong(OID oid) throws IOException {
+
+    public Long getAsLong(OID oid) throws IOException {
         ResponseEvent event = get(new OID[]{oid});
         PDU pdu = event.getResponse();
-        if(pdu != null){
+        if (pdu != null) {
             Variable var = pdu.get(0).getVariable();
-            return (var != null ? var.toLong(): null);
+            return (var != null ? var.toLong() : null);
         }
         return null;
     }
-    
-     public Integer getAsInt(OID oid) throws IOException {
+
+    public Integer getAsInt(OID oid) throws IOException {
         ResponseEvent event = get(new OID[]{oid});
         PDU pdu = event.getResponse();
-        if(pdu != null){
+        if (pdu != null) {
             Variable var = pdu.get(0).getVariable();
-            return (var != null ? var.toInt(): null);
+            return (var != null ? var.toInt() : null);
         }
         return null;
     }
@@ -134,7 +145,7 @@ public class SimpleSNMPManager {
      * @return
      */
     private Target getTarget() {
-        Address targetAddress = GenericAddress.parse(agentAddress.get());
+        Address targetAddress = GenericAddress.parse(agentAddress);
         CommunityTarget target = new CommunityTarget();
         target.setCommunity(new OctetString("public"));
         target.setAddress(targetAddress);
@@ -143,4 +154,31 @@ public class SimpleSNMPManager {
         target.setVersion(SnmpConstants.version2c);
         return target;
     }
+
+    public List<Application> getServerApplications() {
+        TableUtils tableUtils = new TableUtils(snmp, new DefaultPDUFactory());
+        List<TableEvent> events = tableUtils.getTable(getTarget(), new OID[]{new OID(serverApplications + ".1"), new OID(serverApplications + ".2"), new OID(serverApplications + ".3"), new OID(serverApplications + ".4"), new OID(serverApplications + ".5"), new OID(serverApplications + ".6")}, null, null);
+        List<Application> applications = new ArrayList<Application>();
+        for (TableEvent event : events){
+              Application app = new Application();
+              VariableBinding[] varBind = event.getColumns();
+              app.setName(varBind[0].getVariable().toString());
+              app.setActiveSessions(varBind[1].getVariable().toInt());
+              app.setTotalRequests(varBind[2].getVariable().toLong());
+              app.setTotalErrors(varBind[3].getVariable().toLong());
+              app.setMaxResponseTime(varBind[4].getVariable().toInt());
+              app.setAvgResponseTime(varBind[5].getVariable().toInt());
+              applications.add(app);
+           }
+        return applications;
+    }
+
+    public String getAgentAddress() {
+        return agentAddress;
+    }
+
+    public void setAgentAddress(String agentAddress) {
+        this.agentAddress = agentAddress;
+    }
+    
 }

@@ -21,11 +21,11 @@
 package org.serverfaces.agent.mib;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -45,8 +45,10 @@ import org.snmp4j.agent.MOGroup;
 import org.snmp4j.agent.MOServer;
 import org.snmp4j.agent.ManagedObject;
 import org.snmp4j.agent.mo.MOAccessImpl;
+import org.snmp4j.agent.mo.MOMutableTableModel;
 import org.snmp4j.agent.mo.MOScalar;
 import org.snmp4j.agent.mo.MOTable;
+import org.snmp4j.agent.mo.MOTableRow;
 import org.snmp4j.smi.Counter64;
 import org.snmp4j.smi.Gauge32;
 import org.snmp4j.smi.OID;
@@ -72,39 +74,40 @@ public class MibManager implements Serializable, MOGroup {
     private DefaultMOServer moServer;
     private OctetString context;
     @Inject
-    Instance<OID> serverName;
+    OID serverName;
     @Inject
-    Instance<OID> serverUptime;
+    OID serverUptime;
     @Inject
-    Instance<OID> serverActiveSessions;
+    OID serverActiveSessions;
     @Inject
-    Instance<OID> serverUsedMemory;
+    OID serverUsedMemory;
     @Inject
-    Instance<OID> serverAvailableMemory;
+    OID serverAvailableMemory;
     @Inject
-    Instance<OID> serverCpuTime;
+    OID serverCpuTime;
     @Inject
-    Instance<OID> serverActiveTransactions;
+    OID serverActiveTransactions;
     @Inject
-    Instance<OID> serverCommitedTransactions;
+    OID serverCommitedTransactions;
     @Inject
-    Instance<OID> serverRollbackTransactions;
+    OID serverRollbackTransactions;
     @Inject
-    Instance<OID> serverActiveThreads;
+    OID serverActiveThreads;
     @Inject
-    Instance<OID> serverTotalRequests;
+    OID serverTotalRequests;
     @Inject
-    Instance<OID> serverAddress;
+    OID serverAddress;
     @Inject
-    Instance<OID> serverTotalErrors;
+    OID serverTotalErrors;
     @Inject
-    Instance<OID> serverMaxResponseTime;
+    OID serverMaxResponseTime;
     @Inject
-    Instance<OID> serverAvgResponseTime;
+    OID serverAvgResponseTime;
     @Inject
-    Instance<OID> serverLog;
+    OID serverLog;
     @Inject
-    Instance<OID> serverApplications;
+    OID serverApplications;
+    private MOTable applicationsTable;
     
     /**
      * A server retriever is the guy who retrieves information from a server,
@@ -148,41 +151,41 @@ public class MibManager implements Serializable, MOGroup {
     private void initMOs() {
         log.debug("Registering Mib objects...");
          try {
-             //serverRetriever.getServerApplications();
             // register MOs
-            addInstance(MOScalarFactory.createReadWrite(serverName.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverName,
                     serverRetriever.getServerName()));
-            addInstance(MOScalarFactory.createReadWrite(serverAddress.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverAddress,
                     serverRetriever.getServerAddress()));
-            addInstance(MOScalarFactory.createReadWrite(serverUptime.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverUptime,
                     serverRetriever.getServerUpTime()));
-            addInstance(MOScalarFactory.createReadWrite(serverActiveSessions.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverActiveSessions,
                     serverRetriever.getServerActiveSessions()));
-            addInstance(MOScalarFactory.createReadWrite(serverUsedMemory.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverUsedMemory,
                     serverRetriever.getServerUsedMemory()));
-            addInstance(MOScalarFactory.createReadWrite(serverAvailableMemory.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverAvailableMemory,
                     serverRetriever.getServerAvailableMemory()));
-            addInstance(MOScalarFactory.createReadWrite(serverCpuTime.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverCpuTime,
                     serverRetriever.getServerCpuTime()));
-            addInstance(MOScalarFactory.createReadWrite(serverActiveTransactions.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverActiveTransactions,
                     serverRetriever.getServerActiveTransactions()));
-            addInstance(MOScalarFactory.createReadWrite(serverCommitedTransactions.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverCommitedTransactions,
                     serverRetriever.getServerCommitedTransactions()));
-            addInstance(MOScalarFactory.createReadWrite(serverRollbackTransactions.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverRollbackTransactions,
                     serverRetriever.getServerRollbackTransactions()));
-            addInstance(MOScalarFactory.createReadWrite(serverActiveThreads.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverActiveThreads,
                     serverRetriever.getServerActiveThreads()));
-            addInstance(MOScalarFactory.createReadWrite(serverTotalRequests.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverTotalRequests,
                     serverRetriever.getServerTotalRequests()));
-            addInstance(MOScalarFactory.createReadWrite(serverLog.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverLog,
                     serverRetriever.getServerLog()));
-            addInstance(MOScalarFactory.createReadWrite(serverTotalErrors.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverTotalErrors,
                     serverRetriever.getServerTotalErrors()));
-            addInstance(MOScalarFactory.createReadWrite(serverMaxResponseTime.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverMaxResponseTime,
                     serverRetriever.getServerMaxResponseTime()));
-            addInstance(MOScalarFactory.createReadWrite(serverAvgResponseTime.get(),
+            addInstance(MOScalarFactory.createReadWrite(serverAvgResponseTime,
                     serverRetriever.getServerAvgResponseTime()));
-            addInstance(createApplicationTable());
+            applicationsTable = this.createApplicationTable();
+            addInstance(applicationsTable);
             
             this.registerMOs();
         } catch (DuplicateRegistrationException ex) {
@@ -240,6 +243,13 @@ public class MibManager implements Serializable, MOGroup {
     public boolean removeInstance(ManagedObject mo) {
         return objects.remove(mo);
     }
+    
+    public boolean removeInstance(ManagedObject mo, boolean unregister) {
+        if(unregister){
+            moServer.unregister(mo, context);
+        }
+        return objects.remove(mo);
+    }
 
     public OctetString getContext() {
         return context;
@@ -252,6 +262,10 @@ public class MibManager implements Serializable, MOGroup {
     public void updateMIB(@Observes UpdateMibEvent updateMib) {
         this.updateMIB();
     }
+    
+//    public void updateApplications(){
+//        MOTable tableApplication
+//    }
 
     /**
      * updates dynamic values in management information base
@@ -272,6 +286,7 @@ public class MibManager implements Serializable, MOGroup {
         this.setScalar(getServerTotalErrors(), new Counter64(serverRetriever.getServerTotalErrors()));
         this.setScalar(getServerMaxResponseTime(), new Gauge32(serverRetriever.getServerMaxResponseTime()));
         this.setScalar(getServerAvgResponseTime(), new Gauge32(serverRetriever.getServerAvgResponseTime()));
+        this.updateApplicationTable();
 //        this.setScalar(serverLog.get(), new OctetString(serverRetriever.getServerLog()));
     }
 
@@ -281,6 +296,8 @@ public class MibManager implements Serializable, MOGroup {
         }
        return null;
     }
+    
+ 
 
     public void setScalar(OID oid, Variable value) {
         MOScalar scalar = findScalar(oid);
@@ -302,73 +319,82 @@ public class MibManager implements Serializable, MOGroup {
         return null;
     }
     
-       public OID getServerName() {
-        return serverName.get();
+     public OID getServerName() {
+        return serverName;
     }
 
     public OID getServerUptime() {
-        return serverUptime.get();
+        return serverUptime;
     }
 
     public OID getServerActiveSessions() {
-        return serverActiveSessions.get();
+        return serverActiveSessions;
     }
 
     public OID getServerUsedMemory() {
-        return serverUsedMemory.get();
+        return serverUsedMemory;
     }
 
     public OID getServerAvailableMemory() {
-        return serverAvailableMemory.get();
+        return serverAvailableMemory;
     }
 
     public OID getServerCpuTime() {
-        return serverCpuTime.get();
+        return serverCpuTime;
     }
 
     public OID getServerActiveTransactions() {
-        return serverActiveTransactions.get();
+        return serverActiveTransactions;
     }
 
     public OID getServerCommitedTransactions() {
-        return serverCommitedTransactions.get();
+        return serverCommitedTransactions;
     }
 
     public OID getServerRollbackTransactions() {
-        return serverRollbackTransactions.get();
+        return serverRollbackTransactions;
     }
 
     public OID getServerActiveThreads() {
-        return serverActiveThreads.get();
+        return serverActiveThreads;
     }
 
     public OID getServerTotalRequests() {
-        return serverTotalRequests.get();
+        return serverTotalRequests;
     }
 
     public OID getServerAddress() {
-        return serverAddress.get();
+        return serverAddress;
     }
 
     public OID getServerLog() {
-        return serverLog.get();
+        return serverLog;
     }
     
     public OID getServerTotalErrors() {
-        return serverTotalErrors.get();
+        return serverTotalErrors;
     }
     
     public OID getServerMaxResponseTime() {
-        return serverMaxResponseTime.get();
+        return serverMaxResponseTime;
     }
     
     public OID getServerAvgResponseTime() {
-        return serverAvgResponseTime.get();
+        return serverAvgResponseTime;
     }
     
     public OID getserverApplications() {
-        return serverApplications.get();
+        return serverApplications;
     }
+
+    public MOMutableTableModel getTableModel() {
+        if(applicationsTable != null){
+            return (MOMutableTableModel) applicationsTable.getModel();
+        }
+        return null;
+    }
+    
+    
 
     private MOTable createApplicationTable() {
         MOTableBuilder builder = new MOTableBuilder(getserverApplications()).
@@ -389,8 +415,21 @@ public class MibManager implements Serializable, MOGroup {
         }
         
        
-        return builder.build();
+       return builder.build();
         
+    }
+    
+    /**
+     * just recreate table to update server applications
+     * 
+     */
+    public void updateApplicationTable(){
+         getTableModel().clear();
+         
+        for (Iterator<MOTableRow> i = this.createApplicationTable().getModel().iterator(); i.hasNext();) {
+             getTableModel().addRow(i.next());
+        }
+       
     }
    
 }

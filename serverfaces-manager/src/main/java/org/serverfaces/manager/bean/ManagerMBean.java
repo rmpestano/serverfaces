@@ -15,8 +15,8 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.log4j.Logger;
+import org.serverfaces.common.manager.SNMPManager;
 import org.serverfaces.common.qualifier.Log;
-import org.serverfaces.manager.SNMPManager;
 import org.serverfaces.common.model.Application;
 import org.serverfaces.common.model.Server;
 import org.serverfaces.manager.util.MessagesController;
@@ -102,7 +102,7 @@ public class ManagerMBean implements Serializable{
            
             Server s = new Server(agentAddress);
             servers.add(s);
-            this.doServerMoniring(s);
+            this.doServerMontoring(s);
             messages.addInfo("Server added successfully!");
         } catch (IOException ex) {
             //TODO handle exception
@@ -168,11 +168,11 @@ public class ManagerMBean implements Serializable{
 
     public void doMonitoring() throws IOException{
         for (Server server : servers) {
-            doServerMoniring(server);
+            doServerMontoring(server);
         }
     }
     
-    public void doServerMoniring(Server server) throws IOException {
+    public void doServerMontoring(Server server) throws IOException {
           sNMPManager.setAgentAddress(server.getAgentAddress());
           server.setName(sNMPManager.getAsString(serverName.get()));
           server.setActiveSessions(sNMPManager.getAsInt(serverActiveSessions.get()));
@@ -188,17 +188,12 @@ public class ManagerMBean implements Serializable{
           server.setMaxResponseTime(sNMPManager.getAsInt(serverMaxResponseTime.get()));
           server.setAvgResponseTime(sNMPManager.getAsInt(serverAvgResponseTime.get()));
           server.setUptime(sNMPManager.getAsString(serverUptime.get()));
+          server.setApplications(sNMPManager.getServerApplications());
      }
     
-    public void doApplicationMonitoring(Server s){
+    public void doApplicationMonitoring(Server s) throws IOException{
         server = s;
-        Application a = new Application();
-        a.setName("App1");
-        Application a2 = new Application();
-        a2.setName("App2");
-        server.getApplications().add(a2);
-        server.getApplications().add(a);
-        //TODO get app info via snmp
+        doServerMontoring(server);
     }
     
 }

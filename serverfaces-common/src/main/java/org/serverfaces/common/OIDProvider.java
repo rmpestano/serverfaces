@@ -26,13 +26,8 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import javax.ejb.Lock;
-import javax.ejb.LockType;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.serverfaces.common.qualifier.Log;
 import org.serverfaces.common.qualifier.PropertyFile;
@@ -59,9 +54,6 @@ import org.snmp4j.smi.OID;
  * @author Rafael M. Pestano
  */
 @Singleton
-@Startup
-@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-@Lock(LockType.READ)
 public class OIDProvider {
 
     private Map<String, OID> provider;
@@ -103,4 +95,5 @@ public class OIDProvider {
     public Map<String, OID> getProvider() {
         return provider;
     }
+    
 }

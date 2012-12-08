@@ -100,7 +100,7 @@ public class GlassfishRetriever implements ServerRetriever {
             this.managementResource = this.restClient.resource(getRestMonitoringURI() + "web/session/");
             JSONObject result = getMonitoringJSONObject("activesessionscurrent");
             Integer value = result.getInt("current");
-            return value != null ? value : 0;
+            return value == null || value < 0 ? 0: value ;
         } catch (JSONException ex) {
             throw new CouldNotRetrieveDataException("Could not retrieve serverActiveSessions:" + ex.getMessage());
         }

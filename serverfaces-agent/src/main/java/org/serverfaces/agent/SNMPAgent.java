@@ -24,13 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
-import javax.enterprise.event.Event;
-import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.log4j.Logger;
-import org.serverfaces.agent.event.InitMibEvent;
 import org.serverfaces.common.qualifier.Log;
 
 import org.snmp4j.TransportMapping;
@@ -223,8 +220,12 @@ public class SNMPAgent extends BaseAgent implements Serializable {
 
     @Override
     public void stop() {
-        super.stop();
-        unregisterManagedObjects();
+        if(getSession() != null){
+             super.stop();
+             unregisterManagedObjects();
+        }
+       
+       
     }
 
     @Override

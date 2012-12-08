@@ -5,6 +5,7 @@
 package org.serverfaces.agent.test;
 
 import java.io.IOException;
+import java.util.List;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
@@ -27,7 +28,8 @@ import org.serverfaces.agent.server.glassfish.GlassfishRetriever;
 import org.serverfaces.agent.server.jboss.JBossASRetriever;
 import org.serverfaces.agent.server.tomee.TomEERetriever;
 import org.serverfaces.agent.server.weblogic.WebLogicRetriever;
-import org.serverfaces.agent.util.SimpleSNMPManager;
+import org.serverfaces.common.manager.SNMPManager;
+import org.serverfaces.common.model.Application;
 import org.serverfaces.common.qualifier.Log;
 import org.snmp4j.smi.OID;
 
@@ -44,16 +46,13 @@ import org.snmp4j.smi.OID;
 public class TestAgent {
 
     public static final String NO_SUCH_OBJECT = "noSuchObject";
-    
     @Inject
     Monitor monitor;
-    
     @Inject
-    SimpleSNMPManager snmpManager;
-    
-    @Inject @Log
+    SNMPManager snmpManager;
+    @Inject
+    @Log
     Logger log;
-    
     //OIDs
     @Inject
     Instance<OID> serverName;//same as -> new OID(".1.3.6.1.2.1.1.1.0")
@@ -86,9 +85,8 @@ public class TestAgent {
     @Inject
     Instance<OID> serverLog;    //same as -> new OID(".1.3.6.1.2.1.1.16.0")
     @Inject
-    Instance<OID> serverApplications;    //same as -> new OID(".1.3.6.1.2.1.1.17")
-    
-    @Inject 
+    OID serverApplications;    //same as -> new OID(".1.3.6.1.2.1.1.17")
+    @Inject
     Instance<Boolean> agentIsRunning;
 
     @Deployment
@@ -100,9 +98,9 @@ public class TestAgent {
         WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(ServerRetriever.class, Monitor.class, SNMPAgent.class,
                 GlassfishRetriever.class, JBossASRetriever.class, TomEERetriever.class,
-                 WebLogicRetriever.class, SNMPAgent.class)
+                WebLogicRetriever.class, SNMPAgent.class)
                 .addPackage("org.serverfaces.agent.util").addPackage("org.serverfaces.agent.mib")
-                .addPackage("org.serverfaces.common").addPackage("org.serverfaces.common.qualifier")
+                .addPackage("org.serverfaces.common").addPackage("org.serverfaces.common.manager").addPackage("org.serverfaces.common.qualifier")
                 .addAsLibraries(resolver.artifact("org.snmp4j:snmp4j-agent:2.0.6").resolveAsFiles())
                 .addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
                 .addAsResource("agent.properties").addAsResource("mib.properties");
@@ -115,110 +113,117 @@ public class TestAgent {
     public void getServerNameResultNotNullAndExistingObject() throws IOException {
         String serverNameValue = snmpManager.getAsString(this.serverName.get());
         this.validateSNMPGet(serverNameValue);
-        log.info("Server name: "+serverNameValue);
+        log.info("Server name: " + serverNameValue);
     }
 
     @Test
     public void getServerUpTimeResultNotNullAndExistingObject() throws IOException {
         String serverUptimeValue = snmpManager.getAsString(this.serverUptime.get());
         this.validateSNMPGet(serverUptimeValue);
-        log.info("Server uptime: "+serverUptimeValue);
+        log.info("Server uptime: " + serverUptimeValue);
     }
 
     @Test
     public void getServerActiveSessionsResultNotNullAndExistingObject() throws IOException {
         Integer serverActiveSessionsValue = snmpManager.getAsInt(this.serverActiveSessions.get());
         this.validateSNMPGet(serverActiveSessionsValue);
-        log.info("Server active sessions: "+serverActiveSessionsValue);
+        log.info("Server active sessions: " + serverActiveSessionsValue);
     }
 
     @Test
     public void getServerUsedMemoryResultNotNullAndExistingObject() throws IOException {
         Integer serverUsedMemoryValue = snmpManager.getAsInt(this.serverUsedMemory.get());
         this.validateSNMPGet(serverUsedMemoryValue);
-        log.info("Server used memory(bytes): "+serverUsedMemoryValue);
+        log.info("Server used memory(bytes): " + serverUsedMemoryValue);
     }
 
     @Test
     public void getServerAvailableMemoryResultNotNullAndExistingObject() throws IOException {
         Integer serverAvailableMemoryValue = snmpManager.getAsInt(this.serverAvailableMemory.get());
         this.validateSNMPGet(serverAvailableMemoryValue);
-        log.info("Server available memory(bytes): "+serverAvailableMemoryValue);
+        log.info("Server available memory(bytes): " + serverAvailableMemoryValue);
     }
 
     @Test
     public void getServerCpuTimeResultNotNullAndExistingObject() throws IOException {
         Integer serverCpuTimeValue = snmpManager.getAsInt(this.serverCpuTime.get());
         this.validateSNMPGet(serverCpuTimeValue);
-        log.info("Server cpu time(ms): "+serverCpuTimeValue);
+        log.info("Server cpu time(ms): " + serverCpuTimeValue);
     }
-    
+
     @Test
     public void getServerActiveTransactionsResultNotNullAndExistingObject() throws IOException {
         Integer serverActiveTransactionsValue = snmpManager.getAsInt(this.serverActiveTransactions.get());
         this.validateSNMPGet(serverActiveTransactionsValue);
-        log.info("Server active transactions: "+serverActiveTransactionsValue);
+        log.info("Server active transactions: " + serverActiveTransactionsValue);
     }
-    
+
     @Test
     public void getServerCommitedTransactionsResultNotNullAndExistingObject() throws IOException {
         Integer serverCommitedTransactionsValue = snmpManager.getAsInt(this.serverCommitedTransactions.get());
         this.validateSNMPGet(serverCommitedTransactionsValue);
-        log.info("Server commited transactions: "+serverCommitedTransactionsValue);
+        log.info("Server commited transactions: " + serverCommitedTransactionsValue);
     }
-    
+
     @Test
     public void getServerRollbackTransactionsResultNotNullAndExistingObject() throws IOException {
         Integer serverRollbackTransactionsValue = snmpManager.getAsInt(this.serverRollbackTransactions.get());
         this.validateSNMPGet(serverRollbackTransactionsValue);
-        log.info("Server rollback transactions: "+serverRollbackTransactionsValue);
+        log.info("Server rollback transactions: " + serverRollbackTransactionsValue);
     }
-    
+
     @Test
     public void getServerActiveThreadsResultNotNullAndExistingObject() throws IOException {
         Integer serverActiveThreadsValue = snmpManager.getAsInt(this.serverActiveThreads.get());
         this.validateSNMPGet(serverActiveThreadsValue);
-        log.info("Server active threads: "+serverActiveThreadsValue);
+        log.info("Server active threads: " + serverActiveThreadsValue);
     }
-    
+
     @Test
     public void getServerTotalRequestsResultNotNullAndExistingObject() throws IOException {
         Long serverTotalRequestsValue = snmpManager.getAsLong(this.serverTotalRequests.get());
         this.validateSNMPGet(serverTotalRequestsValue);
-        log.info("Server total requests: "+serverTotalRequestsValue);
+        log.info("Server total requests: " + serverTotalRequestsValue);
     }
-    
+
     @Test
     public void getServerLogResultNotNullAndExistingObject() throws IOException {
         String serverLogValue = snmpManager.getAsString(this.serverLog.get());
         this.validateSNMPGet(serverLogValue);
-        log.info("Server log: "+serverLogValue);
+        log.info("Server log: " + serverLogValue);
     }
-    
+
     @Test
     public void getServerErrorsResultNotNullAndExistingObject() throws IOException {
         String serverErrorsValue = snmpManager.getAsString(this.serverTotalErrors.get());
         this.validateSNMPGet(serverErrorsValue);
-        log.info("Server errors: "+serverErrorsValue);
+        log.info("Server errors: " + serverErrorsValue);
     }
-    
+
     @Test
     public void getServerMaxResponseResultNotNullAndExistingObject() throws IOException {
         String serverMaxResponseValue = snmpManager.getAsString(this.serverMaxResponseTime.get());
         this.validateSNMPGet(serverMaxResponseValue);
-        log.info("Server max response: "+serverMaxResponseValue);
+        log.info("Server max response: " + serverMaxResponseValue);
     }
-    
+
     @Test
     public void getServerAvgResponseResultNotNullAndExistingObject() throws IOException {
         String serverAvgResponseValue = snmpManager.getAsString(this.serverAvgResponseTime.get());
         this.validateSNMPGet(serverAvgResponseValue);
-        log.info("Server average response: "+serverAvgResponseValue);
+        log.info("Server average response: " + serverAvgResponseValue);
     }
-    
+
     @Test
     public void getServerApplicationsResultNotNullAndExistingObject() throws IOException {
-         Assert.assertTrue(true);
+        List<Application> applications = snmpManager.getServerApplications();
+        if (applications != null && !applications.isEmpty()) {
+            log.info("Listing server applications");
+            for (Application application : applications) {
+                log.info(application);
+            }
+        }
+
     }
 
     /**
@@ -232,7 +237,7 @@ public class TestAgent {
          * agent must be running to tests pass
          */
         Assert.assertTrue(agentIsRunning.get());
-        
+
         /**
          * result null usually occours when manager couldn't reach agent
          */
@@ -242,7 +247,7 @@ public class TestAgent {
          * doesnt exist in the mib(its not managed by the agent)
          */
         Assert.assertNotSame(NO_SUCH_OBJECT, getResult);
-        
+
 
     }
 }

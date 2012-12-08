@@ -21,7 +21,7 @@
             <p:dataGrid rendered="#{not empty managerMBean.servers}" columns="2" value="#{managerMBean.servers}" var="s">   
                 <p:panel  header="#{s.name}" style="width: 370px;overflow: auto;font-size: 11px;overflow-x: hidden" styleClass="monitoringPanel ui-panel-title" >
                     <f:facet name="actions">  
-                        <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{managerMBean.doServerMoniring(s)}" oncomplete="alert('call')" update="@form">  
+                        <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{managerMBean.doServerMontoring}" oncomplete="alert('call')" update="@form">  
                             <h:outputText styleClass="ui-icon ui-icon-help" />  
                         </p:commandLink>  
                     </f:facet>  
