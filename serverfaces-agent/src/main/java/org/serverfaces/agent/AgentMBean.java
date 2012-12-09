@@ -55,8 +55,8 @@ public class AgentMBean implements Serializable {
     public String getUiServerName() {
         if (uiServerName == null) {
             MOScalar moScalar = mibManager.findScalar(serverName.get());
-            if(moScalar != null){
-                  uiServerName = moScalar.getValue().toString();
+            if (moScalar != null) {
+                uiServerName = moScalar.getValue().toString();
             }
         }
         return uiServerName;
@@ -65,31 +65,35 @@ public class AgentMBean implements Serializable {
     public String getUiServerAddress() {
         if (uiServerAddress == null) {
             MOScalar moScalar = mibManager.findScalar(serverAddress.get());
-            if(moScalar != null){
+            if (moScalar != null) {
                 uiServerAddress = moScalar.getValue().toString();
             }
         }
         return uiServerAddress;
     }
-    
-    public boolean isAgentRunning(){
+
+    public boolean isAgentRunning() {
         return (agent != null && agent.isRunning());
     }
-    
-    public String startStop() throws IOException{
-        if(isAgentRunning()){
+
+    public void startStop() throws IOException {
+        if (isAgentRunning()) {
             agent.stop();
-        }
-        else{
-            agent.start();
-            try{
-                mibManager.initMIB(agent.getServer(),agent.getDefaultContext());
-            }catch(CouldNotRetrieveDataException ex){
-                agent.stop();
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Could not start agent",ex.getMessage()));
+        } else {
+            try {
+                agent.start();
+
+            } catch (Exception ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Could not start agent", ex.getMessage()));
             }
-            
+            try {
+                mibManager.initMIB(agent.getServer(), agent.getDefaultContext());
+            } catch (CouldNotRetrieveDataException cnr) {
+                agent.stop();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Could not start agent", cnr.getMessage()));
+
+
+            }
         }
-        return null;
     }
 }

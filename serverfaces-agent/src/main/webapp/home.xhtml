@@ -15,14 +15,19 @@
                 <title>Server Faces Agent...</title>
           </h:head>
         <h:body>
-            <center><h:messages showDetail="true" showSummary="true" errorStyle="color:red;font-weight:bold"/></center>
-            <h1>ServerFaces agent is #{agentMBean.agentRunning ? 'running...':'stopped'}</h1>
+           
             <h:form id="mainForm">
+                 <center><h:messages showDetail="true" showSummary="true" errorStyle="color:red;font-weight:bold"/></center>
+
+                <h1>ServerFaces agent is #{agentMBean.agentRunning ? 'running...':'stopped'}</h1>
+                
                 Agent is listening at <b>#{agentMBean.agentAddress}</b><br/>
                 Agent is monitoring <b>#{agentMBean.uiServerName}</b> located at <b>#{agentMBean.uiServerAddress}</b> <br/>
                 
                 <br/>
-                    <h:commandButton value="#{agentMBean.agentRunning ?  'Stop':'Start'}" action="#{agentMBean.startStop}" style="width: 125px"/>
+                <h:commandButton value="#{agentMBean.agentRunning ?  'Stop':'Start'}" action="#{agentMBean.startStop}" style="width: 125px">
+                    <f:ajax render="@form"/>
+                </h:commandButton>
             </h:form>
         </h:body> 
     </f:view>
