@@ -78,7 +78,8 @@ public enum Enums {
         SERVER_TOTAL_ERRORS("server.totalErrors"),
         SERVER_MAX_RESPONSE("server.maxResponseTime"),
         SERVER_AVG_RESPONSE("server.avgResponseTime"),
-        SERVER_APPLICATIONS("server.applications");
+        SERVER_APPLICATIONS("server.applications"),
+        SERVER_COMMAND("server.command");
         
         
         public final String value;

@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.serverfaces.common.model.Application;
@@ -22,6 +21,7 @@ import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
+import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
@@ -96,6 +96,15 @@ public class SNMPManager implements Serializable {
         return null;
     }
 
+    public String getAsString(OID oid, String context) throws IOException {
+        ResponseEvent event = get(new OID[]{oid}, context);
+        PDU pdu = event.getResponse();
+        if (pdu != null) {
+            return pdu.get(0).getVariable().toString();
+        }
+        return null;
+    }
+
     public Long getAsLong(OID oid) throws IOException {
         ResponseEvent event = get(new OID[]{oid});
         PDU pdu = event.getResponse();
@@ -138,6 +147,46 @@ public class SNMPManager implements Serializable {
         throw new RuntimeException("GET timed out");
     }
 
+    public ResponseEvent get(OID oids[], String context) throws IOException {
+        PDU pdu = new PDU();
+        for (OID oid : oids) {
+            pdu.add(new VariableBinding(oid));
+        }
+        pdu.setType(PDU.GET);
+        ResponseEvent event = snmp.send(pdu, getTarget(context), null);
+        // manager sends a PDU from adress new UdpAddress()
+        // to target which is the address where agent is listening
+        if (event != null) {
+            return event;
+        }
+        throw new RuntimeException("GET timed out");
+    }
+
+    public String set(OID oid, Variable variable) throws IOException {
+        VariableBinding variableBinding = new VariableBinding(oid, variable);
+        PDU pdu = new PDU();
+        pdu.setType(PDU.SET);
+        pdu.setRequestID(new Integer32(1));
+        pdu.add(variableBinding);
+        ResponseEvent response = snmp.send(pdu, getTarget());
+        if (response != null) {
+            PDU responsePDU = response.getResponse();
+            if (responsePDU != null) {
+                int errorStatus = responsePDU.getErrorStatus();
+                String errorStatusText = responsePDU.getErrorStatusText();
+                if (errorStatus == PDU.noError) {
+                    return responsePDU.get(0).getVariable().toString();
+                } else {
+                    return errorStatusText;
+                }
+            } else {
+                return "No response";
+            }
+        } else {
+            return null;
+        }
+    }
+
     /**
      * This method returns a Target, which contains information about where the
      * data should be fetched and how.
@@ -148,6 +197,17 @@ public class SNMPManager implements Serializable {
         Address targetAddress = GenericAddress.parse(agentAddress);
         CommunityTarget target = new CommunityTarget();
         target.setCommunity(new OctetString("public"));
+        target.setAddress(targetAddress);
+        target.setRetries(2);
+        target.setTimeout(1500);
+        target.setVersion(SnmpConstants.version2c);
+        return target;
+    }
+
+    private Target getTarget(String comunity) {
+        Address targetAddress = GenericAddress.parse(agentAddress);
+        CommunityTarget target = new CommunityTarget();
+        target.setCommunity(new OctetString(comunity));
         target.setAddress(targetAddress);
         target.setRetries(2);
         target.setTimeout(1500);

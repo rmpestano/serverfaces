@@ -102,6 +102,13 @@ public class JBossASRetriever implements ServerRetriever{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public void executeCommand(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+     
+
      
 
 }

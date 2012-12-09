@@ -186,6 +186,7 @@ public class SNMPAgent extends BaseAgent implements Serializable {
         // loadConfig(ImportModes.REPLACE_CREATE);
         addShutdownHook();
         getServer().addContext(new OctetString("public"));
+        getServer().addContext(new OctetString("private"));
         finishInit();
         run();
         sendColdStartNotification();

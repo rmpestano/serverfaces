@@ -107,6 +107,8 @@ public class MibManager implements Serializable, MOGroup {
     OID serverLog;
     @Inject
     OID serverApplications;
+    @Inject 
+    OID serverCommand;
     private MOTable applicationsTable;
     
     /**
@@ -187,6 +189,8 @@ public class MibManager implements Serializable, MOGroup {
                     serverRetriever.getServerAvgResponseTime()));
             applicationsTable = this.createApplicationTable();
             addInstance(applicationsTable);
+            addInstance(MOScalarFactory.createReadWrite(serverCommand,""));
+            registerCommand();
             
             this.registerMOs();
         } catch (DuplicateRegistrationException ex) {
@@ -210,6 +214,10 @@ public class MibManager implements Serializable, MOGroup {
         for (ManagedObject mo : objects) {
             server.register(mo, context);
         }
+    }
+    
+    public void registerCommand() throws DuplicateRegistrationException{
+        moServer.register(MOScalarFactory.createReadWrite(serverCommand,""), new OctetString("private"));
     }
 
     public DefaultMOServer getMoServer() {
@@ -289,6 +297,7 @@ public class MibManager implements Serializable, MOGroup {
         this.setScalar(getServerMaxResponseTime(), new Gauge32(serverRetriever.getServerMaxResponseTime()));
         this.setScalar(getServerAvgResponseTime(), new Gauge32(serverRetriever.getServerAvgResponseTime()));
         this.updateApplicationTable();
+        this.executeCommand();
 //        this.setScalar(serverLog.get(), new OctetString(serverRetriever.getServerLog()));
     }
 
@@ -432,6 +441,16 @@ public class MibManager implements Serializable, MOGroup {
              getTableModel().addRow(i.next());
         }
        
+    }
+
+    private void executeCommand() {
+        MOScalar scalar = findScalar(serverCommand);
+        if(scalar != null){
+            String command = scalar.getValue().toString();
+            if(command != null && !"".equals(command)){
+                serverRetriever.executeCommand(command);
+            }
+        }
     }
    
 }

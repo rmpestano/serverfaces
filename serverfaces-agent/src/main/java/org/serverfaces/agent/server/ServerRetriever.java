@@ -128,4 +128,10 @@ public interface ServerRetriever {
     
     
     List<Application> getServerApplications();
+    
+    /**
+     * generic command to execute via SNMP set
+     * @param name of the command eg: start/stop
+     */
+    void executeCommand(String name);
 }

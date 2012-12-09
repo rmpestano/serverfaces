@@ -52,7 +52,8 @@ public class TestAgent {
     @Inject
     SNMPManager snmpManager;
     @Inject
-    @Log  Logger log;
+    @Log
+    Logger log;
     //OIDs
     @Inject
     Instance<OID> serverName;//same as -> new OID(".1.3.6.1.2.1.1.1.0")
@@ -88,8 +89,11 @@ public class TestAgent {
     OID serverApplications;    //same as -> new OID(".1.3.6.1.2.1.1.17")
     @Inject
     Instance<Boolean> agentIsRunning;
-    
-    @Inject String agentAddress;
+    @Inject
+    OID serverCommand;
+    @Inject
+    String agentAddress;
+
     @Deployment
     public static Archive<?> createTestArchive() {
         MavenDependencyResolver resolver = DependencyResolvers
@@ -109,9 +113,9 @@ public class TestAgent {
 //        System.out.println(war.toString(true));
         return war;
     }
-    
+
     @Before
-    public void init(){
+    public void init() {
         snmpManager.setAgentAddress(agentAddress);
     }
 
@@ -230,6 +234,13 @@ public class TestAgent {
             }
         }
 
+    }
+
+    @Test
+    public void getServerCommand() throws IOException {
+//        String response = snmpManager.set(serverCommand, new OctetString("stop"));
+//        String value = snmpManager.getAsString(serverCommand);
+//        Assert.assertEquals("stop", value);
     }
 
     /**

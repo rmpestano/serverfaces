@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.serverfaces.agent.server.weblogic;
 
 import java.util.List;
@@ -15,7 +14,7 @@ import org.serverfaces.common.model.Application;
  * @author Rafael M. Pestano - Nov 15, 2012 8:23:57 PM
  */
 @Alternative
-public class WebLogicRetriever implements ServerRetriever{
+public class WebLogicRetriever implements ServerRetriever {
 
     @Override
     public String getServerName() {
@@ -102,7 +101,8 @@ public class WebLogicRetriever implements ServerRetriever{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-   
-
-
+    @Override
+    public void executeCommand(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

@@ -20,6 +20,7 @@
  */
 package org.serverfaces.agent.mo;
 
+import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.mo.MOAccessImpl;
 import org.snmp4j.agent.mo.MOScalar;
 import org.snmp4j.smi.Counter64;
@@ -43,6 +44,12 @@ public class MOScalarFactory {
     public static MOScalar createReadWrite(OID oid, Object value) {
         return new MOScalar(oid,
                 MOAccessImpl.ACCESS_READ_WRITE,
+                getVariable(value));
+    }
+    
+    public static MOScalar create(OID oid, Object value, MOAccess access) {
+        return new MOScalar(oid,
+                access,
                 getVariable(value));
     }
 

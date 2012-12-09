@@ -21,7 +21,9 @@
 package org.serverfaces.agent.server.glassfish;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import java.util.ArrayList;
@@ -35,6 +37,8 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.glassfish.embeddable.GlassFishException;
+import org.glassfish.embeddable.GlassFishRuntime;
 import org.serverfaces.agent.exception.CouldNotRetrieveDataException;
 import org.serverfaces.agent.server.ServerRetriever;
 import org.serverfaces.common.model.Application;
@@ -333,9 +337,30 @@ public class GlassfishRetriever implements ServerRetriever {
         }
     }
 
+
+    /**
+     * /management/domain/view-log/details
+     * @return 
+     */
     @Override
     public String getServerLog() {
         return null;//TODO read server.log file
+    }
+    
+    /**
+     * /management/domain/stop
+     * @throws GlassFishException 
+     * 
+     * stop/restart
+     */
+    @Override
+    public void executeCommand(String name){
+        log.debug("Executing command:"+name +" on server "+getServerName());
+        ClientResponse response = this.restClient.resource(getRestManagementURI()).path(name).header("X-Requested-By","ServerFaces Agent").
+                type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class);
+        int status = response.getStatus();
+        log.debug("Response Status:"+status);
+
     }
 
     //utility methods
@@ -385,4 +410,6 @@ public class GlassfishRetriever implements ServerRetriever {
             throw new CouldNotRetrieveDataException("problems trying to retrieve data from glassfish rest api,monitoring module levels may be OFF");
         }
     }
+
+   
 }

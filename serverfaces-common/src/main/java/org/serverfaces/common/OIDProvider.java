@@ -84,6 +84,7 @@ public class OIDProvider {
         this.provider.put("serverAvgResponseTime", new OID(mib.getProperty(Enums.MIB.SERVER_AVG_RESPONSE.value)));
         this.provider.put("serverLog", new OID(mib.getProperty(Enums.MIB.SERVER_LOG.value)));
         this.provider.put("serverApplications", new OID(mib.getProperty(Enums.MIB.SERVER_APPLICATIONS.value)));
+        this.provider.put("serverCommand", new OID(mib.getProperty(Enums.MIB.SERVER_COMMAND.value)));
         log.debug("OID Provider Initialized!");
     }
 
