@@ -194,4 +194,13 @@ public class ManagerMBean implements Serializable{
         server = s;
     }
     
+    public void doRemoveServer(Server s){
+        if(server != null && server.equals(s)){
+            server = null;
+        }
+        messages.addInfo("Server "+s.getName() +" removed successfully");
+        this.getServers().remove(s);
+        
+    }
+    
 }

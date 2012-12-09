@@ -13,18 +13,15 @@
         <h:panelGrid columns="4" style="margin: 10px; width: 400px" cellpadding="0" cellspacing="0">
             <p:outputLabel for="addServerInpTxr" value="Agent Address:"/>
             <p:inputText autocomplete="true" id="addServerInpTxr" value="#{managerMBean.agentAddress}" required="true" requiredMessage="The agent address is required"/>
-            <p:commandButton value="Add new server..." icon="ui-icon server" action="#{managerMBean.addServer}" async="true" update="mainForm:monitoringPanel #{g}"  style="margin-left: 3px" onclick="blocker.show()" oncomplete="blocker.hide()"/>
+            <p:commandButton value="Add new server..." icon="ui-icon server" action="#{managerMBean.addServer}" async="true" update="mainForm:monitoringPanel #{g}"  style="margin-left: 3px" onclick="blocker.show()" oncomplete="blocker.hide()" partialSubmit="true"/>
         </h:panelGrid>
 
         <p:outputPanel layout="block" id="monitoringPanel">
-            <p:poll interval="1" async="true" partialSubmit="true" process="monitoringPanel" listener="#{managerMBean.doMonitoring}" rendered="#{not empty managerMBean.servers}" update="mainForm:monitoringPanel :appDialogForm:appPanel"/>
+            <p:poll  async="true" partialSubmit="true" listener="#{managerMBean.doMonitoring}" rendered="#{not empty managerMBean.servers}" update="mainForm:monitoringPanel :appDialogForm:appPanel"/>
             <p:dataGrid rendered="#{not empty managerMBean.servers}" columns="2" value="#{managerMBean.servers}" var="s">   
-                <p:panel  header="#{s.name}" style="width: 370px;overflow: auto;font-size: 11px;overflow-x: hidden" styleClass="monitoringPanel ui-panel-title" >
-                    <f:facet name="actions">  
-                        <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{managerMBean.doServerMontoring}" oncomplete="alert('call')" update="@form">  
-                            <h:outputText styleClass="ui-icon ui-icon-help" />  
-                        </p:commandLink>  
-                    </f:facet>  
+                <p:column>
+                <p:panel  header="#{s.name}" style="width: 370px;overflow: auto;font-size: 11px;overflow-x: hidden" styleClass="monitoringPanel ui-panel-title" closable="true" closeSpeed="1000" closeTitle="Stop server monitoring" >
+                    <p:ajax event="close" listener="#{managerMBean.doRemoveServer(s)}" update=":mainForm:monitoringPanel #{g}" oncomplete="document.getElementById('mainForm:menu-monitoring').click();"/>
                     <h:panelGrid columnClasses="label,form" columns="2" style="text-align: right;">
                         <h:outputLabel for="agent" value="Agent:" style="font-weight: bold"/>
                         <h:outputText id="agent" value="#{s.agentAddress}"/>
@@ -68,6 +65,7 @@
                     </center>
                     
                 </p:panel>
+                </p:column>
             </p:dataGrid>
         </p:outputPanel>
 
@@ -80,14 +78,14 @@
     </ui:define>
 
     <ui:define name="popup">
-        <p:dialog id="appDialog" widgetVar="appDialogWdg" width="600" header="Applications of #{managerMBean.server.name}" showEffect="clip" hideEffect="fade" >
+        <p:dialog id="appDialog" widgetVar="appDialogWdg"  header="Applications of #{managerMBean.server.name}" showEffect="clip" hideEffect="fade" >
             <h:form id="appDialogForm">
                 <p:outputPanel id="appPanel">
                     <p:dataTable rendered="#{not empty managerMBean.server.applications}" value="#{managerMBean.server.applications}" var="a">
                         <f:facet name="header">
                             Deployed Applications 
                         </f:facet>
-                        <p:column  headerText="Name">
+                        <p:column  headerText="Name" >
                             #{a.name}
                         </p:column>
                         <p:column  headerText="Sessions">
@@ -103,7 +101,7 @@
                             #{a.maxResponseTime} ms
                         </p:column>
                         <p:column  headerText="Average Response">
-                            #{a.avhResponseTime} ms
+                            #{a.avgResponseTime} ms
                         </p:column>
                     </p:dataTable>
                </p:outputPanel>         

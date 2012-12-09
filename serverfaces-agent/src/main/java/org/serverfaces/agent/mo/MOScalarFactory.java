@@ -41,8 +41,6 @@ public class MOScalarFactory {
     }
 
     public static MOScalar createReadWrite(OID oid, Object value) {
-        System.out.println("Criando OID:"+oid);
-        System.out.println("Valor:"+value);
         return new MOScalar(oid,
                 MOAccessImpl.ACCESS_READ_WRITE,
                 getVariable(value));

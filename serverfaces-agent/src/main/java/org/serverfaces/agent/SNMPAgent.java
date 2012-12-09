@@ -143,7 +143,7 @@ public class SNMPAgent extends BaseAgent implements Serializable {
      */
     @Override
     protected void unregisterManagedObjects() {
-        
+        server.getRegistry().clear();
     }
 
     /**

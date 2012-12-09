@@ -151,6 +151,7 @@ public class MibManager implements Serializable, MOGroup {
     private void initMOs() {
         log.debug("Registering Mib objects...");
          try {
+            this.unregisterMOs(moServer, context);
             // register MOs
             addInstance(MOScalarFactory.createReadWrite(serverName,
                     serverRetriever.getServerName()));
@@ -234,6 +235,7 @@ public class MibManager implements Serializable, MOGroup {
         for (ManagedObject mo : objects) {
             server.unregister(mo, context);
         }
+        objects = new LinkedList<ManagedObject>();
     }
 
     public boolean addInstance(ManagedObject mo) {
