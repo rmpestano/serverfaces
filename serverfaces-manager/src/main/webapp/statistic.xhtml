@@ -9,7 +9,33 @@
 	template="templates/main.xhtml">
     
 	<ui:define name="content">
-              TODO      
+            <f:metadata>
+                <f:event type="preRenderView" listener="#{statisticsMBean.doStatistics}"/>
+            </f:metadata>
+            <h:panelGroup layout="block" id="statistics-panel">
+                <p:poll interval="15" update="memorySerie cpuSerie requestSerie transactionSerie " rendered="#{not empty statisticsMBean.servers}" listener="#{statisticsMBean.doStatistics}"/>
+                <h:panelGrid  rendered="#{not empty statisticsMBean.servers}">
+                    
+                      <p:barChart  id="memorySerie" value="#{statisticsMBean.serverMemoryModel}" legendPosition="ne"  
+                                   title="Memory Statistics(MB)" min="0" max="4096" style="width:600px" animate="true" zoom="true"/>  
+                      
+                      <p:barChart  id="cpuSerie" value="#{statisticsMBean.serverCpuModel}" legendPosition="ne"  
+                                   title="CPU Statistics(ms)" min="0" max="100000"  style="width:600px" animate="true" zoom="true"/>  
+                      
+                      <p:barChart  id="requestSerie" value="#{statisticsMBean.serverRequestModel}" legendPosition="ne"  
+                                   title="Request Statistics" min="0" max="10000"  style="width:600px" animate="true" zoom="true"/>   
+                      
+                      <p:barChart  id="transactionSerie" value="#{statisticsMBean.serverTransactionModel}" legendPosition="ne"  
+                                    title="Transaction Statistics" min="0" max="1500"  style="width:600px" animate="true" zoom="true"/>   
+                </h:panelGrid>  
+            </h:panelGroup>
+            <h:panelGroup rendered="#{empty statisticsMBean.servers}" style="font-size: 14px;" >
+                <br/>
+                <br/>
+                <center>
+                    No server to get statistics from. <h:link outcome="server.faces" value="Click here"/> to add servers.
+                </center>
+            </h:panelGroup>
 	</ui:define>
       
 </ui:composition>

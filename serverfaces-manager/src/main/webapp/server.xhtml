@@ -15,60 +15,60 @@
             <p:inputText autocomplete="true" id="addServerInpTxr" value="#{managerMBean.agentAddress}" required="true" requiredMessage="The agent address is required"/>
             <p:commandButton value="Add new server..." icon="ui-icon server" action="#{managerMBean.addServer}" async="true" update="mainForm:monitoringPanel #{g}"  style="margin-left: 3px" onclick="blocker.show()" oncomplete="blocker.hide()" partialSubmit="true"/>
         </h:panelGrid>
-
         <p:outputPanel layout="block" id="monitoringPanel">
             <p:poll  async="true" partialSubmit="true" listener="#{managerMBean.doMonitoring}" rendered="#{not empty managerMBean.servers}" update="mainForm:monitoringPanel :appDialogForm:appPanel"/>
-            <p:dataGrid rendered="#{not empty managerMBean.servers}" columns="2" value="#{managerMBean.servers}" var="s">   
-                <p:column>
-                <p:panel  header="#{s.name}" style="width: 370px;overflow: auto;font-size: 11px;overflow-x: hidden" styleClass="monitoringPanel ui-panel-title" closable="true" closeSpeed="1000" closeTitle="Stop server monitoring" >
-                    <p:ajax event="close" listener="#{managerMBean.doRemoveServer(s)}" update=":mainForm:monitoringPanel #{g}" oncomplete="document.getElementById('mainForm:menu-monitoring').click();"/>
-                    <h:panelGrid columnClasses="label,form" columns="2" style="text-align: right;">
-                        <h:outputLabel for="agent" value="Agent:" style="font-weight: bold"/>
-                        <h:outputText id="agent" value="#{s.agentAddress}"/>
-                        <h:outputLabel for="uptime" value="Uptime:" style="font-weight: bold"/>
-                        <h:outputText id="uptime" value="#{s.uptime}"/>
-                        <h:outputLabel for="sessions" value=" Active Sessions:" style="font-weight: bold"/>
-                        <h:outputText id="sessions" value="#{s.activeSessions}"/>
-                        <h:outputLabel for="usedMemory" value="Used Memory:" style="font-weight: bold"/>
-                        <h:panelGroup>
-                            <h:outputText id="usedMemory" value="#{s.usedMemory}">
-                                <f:convertNumber maxFractionDigits="3" locale="pt_BR"/>  
-                            </h:outputText>&#160;MB
-                        </h:panelGroup>
-                        <h:outputLabel for="availableMemory" value="Available Memory:" style="font-weight: bold"/>
-                        <h:panelGroup>
-                            <h:outputText id="availableMemory" value="#{s.availableMemory}">
-                                <f:convertNumber maxFractionDigits="3" locale="pt_BR"/>  
-                            </h:outputText>&#160;MB
-                        </h:panelGroup>
-                        <h:outputLabel for="cpuTime" value="Cpu Time:" style="font-weight: bold"/>
-                        <h:outputText id="cpuTime" value="#{s.cpuTime} ms"/>
-                        <h:outputLabel for="activeTransactions" value="Active Transactions:" style="font-weight: bold"/>
-                        <h:outputText id="activeTransactions" value="#{s.activeTransactions}"/>
-                        <h:outputLabel for="commitedTransactions" value="Commited Transactions:" style="font-weight: bold"/>
-                        <h:outputText id="commitedTransactions" value="#{s.commitedTransactions}"/>
-                        <h:outputLabel for="rollbackTransactions" value="Rollback Transactions:" style="font-weight: bold"/>
-                        <h:outputText id="rollbackTransactions" value="#{s.rollbackTransactions}"/>
-                        <h:outputLabel for="activeThreads" value="Active Threads:" style="font-weight: bold"/>
-                        <h:outputText id="activeThreads" value="#{s.activeThreads}"/>
-                        <h:outputLabel for="maxResponse" value="Max Response Time:" style="font-weight: bold"/>
-                        <h:outputText id="maxResponse" value="#{s.maxResponseTime} ms"/>
-                        <h:outputLabel for="avgResponse" value="Average Response Time:" style="font-weight: bold"/>
-                        <h:outputText id="avgResponse" value="#{s.avgResponseTime} ms"/>
-                        <h:outputLabel for="totalRequests" value="Total Requests:" style="font-weight: bold"/>
-                        <h:outputText id="totalRequests" value="#{s.totalRequests}"/>
-                        <h:outputLabel for="totalErrors" value="Total Errors:" style="font-weight: bold"/>
-                        <h:outputText id="totalErrors" value="#{s.totalErrors}"/>
-                    </h:panelGrid>
+                <p:dataGrid rendered="#{not empty managerMBean.servers}" columns="2" value="#{managerMBean.servers}" var="s">   
                     <center>
-                        <p:commandButton value="View Applications" action="#{managerMBean.doApplicationMonitoring(s)}" update=":appDialog" oncomplete="appDialogWdg.show()" async="true" partialSubmit="true"/>
-                    </center>
-                    
-                </p:panel>
-                </p:column>
-            </p:dataGrid>
-        </p:outputPanel>
+                    <p:column>
+                        <p:panel  header="#{s.name}" style="width: 385px;overflow: auto;font-size: 11px;overflow-x: hidden" styleClass="monitoringPanel ui-panel-title" closable="true" closeSpeed="1000" closeTitle="Stop server monitoring" >
+                            <p:ajax event="close" listener="#{managerMBean.doRemoveServer(s)}" update=":mainForm:monitoringPanel #{g}" oncomplete="document.getElementById('mainForm:menu-monitoring').click();"/>
+                            <h:panelGrid columnClasses="label,form" columns="2" style="text-align: right;">
+                                <h:outputLabel for="agent" value="Agent:" style="font-weight: bold"/>
+                                <h:outputText id="agent" value="#{s.agentAddress}"/>
+                                <h:outputLabel for="uptime" value="Uptime:" style="font-weight: bold"/>
+                                <h:outputText id="uptime" value="#{s.uptime}"/>
+                                <h:outputLabel for="sessions" value=" Active Sessions:" style="font-weight: bold"/>
+                                <h:outputText id="sessions" value="#{s.activeSessions}"/>
+                                <h:outputLabel for="usedMemory" value="Used Memory:" style="font-weight: bold"/>
+                                <h:panelGroup>
+                                    <h:outputText id="usedMemory" value="#{s.usedMemory}">
+                                        <f:convertNumber maxFractionDigits="3" locale="pt_BR"/>  
+                                    </h:outputText>&#160;MB
+                                </h:panelGroup>
+                                <h:outputLabel for="availableMemory" value="Available Memory:" style="font-weight: bold"/>
+                                <h:panelGroup>
+                                    <h:outputText id="availableMemory" value="#{s.availableMemory}">
+                                        <f:convertNumber maxFractionDigits="3" locale="pt_BR"/>  
+                                    </h:outputText>&#160;MB
+                                </h:panelGroup>
+                                <h:outputLabel for="cpuTime" value="Cpu Time:" style="font-weight: bold"/>
+                                <h:outputText id="cpuTime" value="#{s.cpuTime} ms"/>
+                                <h:outputLabel for="activeTransactions" value="Active Transactions:" style="font-weight: bold"/>
+                                <h:outputText id="activeTransactions" value="#{s.activeTransactions}"/>
+                                <h:outputLabel for="commitedTransactions" value="Commited Transactions:" style="font-weight: bold"/>
+                                <h:outputText id="commitedTransactions" value="#{s.commitedTransactions}"/>
+                                <h:outputLabel for="rollbackTransactions" value="Rollback Transactions:" style="font-weight: bold"/>
+                                <h:outputText id="rollbackTransactions" value="#{s.rollbackTransactions}"/>
+                                <h:outputLabel for="activeThreads" value="Active Threads:" style="font-weight: bold"/>
+                                <h:outputText id="activeThreads" value="#{s.activeThreads}"/>
+                                <h:outputLabel for="maxResponse" value="Max Response Time:" style="font-weight: bold"/>
+                                <h:outputText id="maxResponse" value="#{s.maxResponseTime} ms"/>
+                                <h:outputLabel for="avgResponse" value="Average Response Time:" style="font-weight: bold"/>
+                                <h:outputText id="avgResponse" value="#{s.avgResponseTime} ms"/>
+                                <h:outputLabel for="totalRequests" value="Total Requests:" style="font-weight: bold"/>
+                                <h:outputText id="totalRequests" value="#{s.totalRequests}"/>
+                                <h:outputLabel for="totalErrors" value="Total Errors:" style="font-weight: bold"/>
+                                <h:outputText id="totalErrors" value="#{s.totalErrors}"/>
+                            </h:panelGrid>
+                            <center>
+                                <p:commandButton value="View Applications" action="#{managerMBean.doApplicationMonitoring(s)}" update=":appDialog" oncomplete="appDialogWdg.show()" async="true" partialSubmit="true"/>
+                            </center>
 
+                        </p:panel>
+                    </p:column>
+                        </center>
+                </p:dataGrid>
+        </p:outputPanel>
         <p:dialog header="Adding Server" widgetVar="blocker" modal="true" showEffect="fade" hideEffect="clip" height="100px" width="250px">
             <br/>
             <center>
@@ -104,7 +104,7 @@
                             #{a.avgResponseTime} ms
                         </p:column>
                     </p:dataTable>
-               </p:outputPanel>         
+                </p:outputPanel>         
             </h:form>
         </p:dialog>
     </ui:define>
