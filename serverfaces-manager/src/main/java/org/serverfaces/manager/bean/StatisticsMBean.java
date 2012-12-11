@@ -5,6 +5,7 @@
 
 package org.serverfaces.manager.bean;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import javax.enterprise.context.SessionScoped;
@@ -38,7 +39,8 @@ public class StatisticsMBean implements Serializable{
      @Inject
      MessagesController messages;
      
-     public void doStatistics(){
+     public void doStatistics() throws IOException{
+         managerMBean.doMonitoring();
          servers = managerMBean.getServers();
          if(servers == null || servers.isEmpty()){
              String baseUrl = ((HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest()).getContextPath();
